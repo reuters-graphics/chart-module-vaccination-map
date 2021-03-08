@@ -5,6 +5,7 @@ import merge from 'lodash/merge';
 import * as topojson from 'topojson-client';
 import AtlasMetadataClient from '@reuters-graphics/graphics-atlas-client';
 import * as d3 from 'd3';
+
 // import { geoVoronoi } from 'd3-geo-voronoi';
 
 d3.selection.prototype.appendSelect = appendSelect;
@@ -45,12 +46,7 @@ class VaccineMap {
    * large in terms of file size. At minimum, though, you should assign an
    * empty Array or Object, depending on what your chart expects.
    */
-  defaultData = [
-    { x: 0, y: 0, r: 1 },
-    { x: 10, y: 35, r: 5 },
-    { x: 40, y: 30, r: 10 },
-    { x: 70, y: 70, r: 15 },
-  ];
+  defaultData = [];
 
   /**
    * Default props are the built-in styles your chart comes with
@@ -59,13 +55,16 @@ class VaccineMap {
    * functions that can get properties from your data.
    */
   defaultProps = {
-    map_stroke_width: .5,
+    map_stroke_width: 0.5,
     map_stroke_color: '#2f353f',
     map_highlight_stroke_width: 1.2,
     map_fill: 'rgba(153,153,153,0.25)',
     map_stroke_color_active: 'rgba(255, 255, 255, 0.75)',
     spike_color: '#eec331',
-    heightRatio: (width, breakpoint) => (width < breakpoint ? 0.8 : 0.5),
+    spike_size: 5,
+    spike_height: 70,
+    min_spike_height: 2,
+    heightRatio: (width, breakpoint) => (width < breakpoint ? 0.8 : 0.9),
     locale: 'en',
     map_custom_projections: {
       clip_box: [[-130, 70], [194, -39]],
@@ -84,7 +83,7 @@ class VaccineMap {
       name: [],
       value: [],
     },
-    mobile: true,
+    mobile: false,
     refBox: {
       height: 90,
       width: 180,
@@ -109,15 +108,15 @@ class VaccineMap {
     if (!topo) return this;
     let useData = data;
     useData.forEach(function(d) {
-      d.perPopulation = d.totalDoses/d.population;
-      d.fullyVaccinatedPerPop = d.peopleFullyVaccinated/d.population;
+      d.perPopulation = d.totalDoses / d.population;
+      d.fullyVaccinatedPerPop = d.peopleFullyVaccinated / d.population;
     });
 
-    useData = useData.filter(d => d[props.variable_name]>0);
-    console.log(useData)
+    useData = useData.filter(d => d[props.variable_name] > 0);
+
     const node = this.selection().node();
     let { width } = node.getBoundingClientRect();
-    const ratio = props.heightRatio(width, props.refBox.breakpoint)
+    const ratio = props.heightRatio(width, props.refBox.breakpoint);
     let useWidth, height;
     if (width < props.refBox.breakpoint && props.mobile) {
       useWidth = props.refBox.useWidth(width,props.refBox.factor);
@@ -177,18 +176,33 @@ class VaccineMap {
     }
 
     const path = d3.geoPath().projection(projection);
+
     svg.selectAll('.country,.disputed,.land').remove();
-    const numberScale=d3.scaleLinear()
+
+    const numberScale = d3.scaleLinear()
       .domain(d3.extent(useData, d => parseFloat(d[props.variable_name])))
-      .range([0, 1])
+      .range([0, 1]);
+
+    const scaleY = d3.scaleLinear()
+      .domain([0,1])
+      .range([props.min_spike_height,props.spike_height])
+
     const landGroups = g.appendSelect('g.land')
       .style('pointer-events', 'none')
       .append('path')
       .style('fill', props.map_fill)
       .attr('d', path(land));
 
-    const filteredCountries = countries.features.filter(d =>filteredCountryKeys.includes(d.properties.isoAlpha2))
-
+    const filteredCountries = countries.features.filter(d => filteredCountryKeys.includes(d.properties.isoAlpha2));
+    
+    const filteredCountriesCentroids = filteredCountries.map(({ properties }) => ({
+        type: 'Feature',
+        properties,
+        geometry: {
+          type: 'Point',
+          coordinates: properties.centroid,
+        },
+      }))
     const countryGroups = g.appendSelect('g.countries')
       .style('pointer-events', 'none')
       .style('fill', props.map_fill)
@@ -202,6 +216,7 @@ class VaccineMap {
       .style('stroke-width', props.map_stroke_width)
       .attr('class', d => `country c-${d.properties.slug} level-0`)
       .merge(countryGroups)
+      .style('opacity',.3)
       .attr('fill', function(d) {
         return props.color_scale(
           numberScale(
@@ -212,6 +227,37 @@ class VaccineMap {
         );
       })
       .attr('d', path);
+
+    const centroidGroup = g.appendSelect('g.centroids')
+      .style('pointer-events', 'none')
+      .style('fill', props.map_fill)
+      .selectAll('path.centroid')
+      .data(filteredCountriesCentroids.filter(d=>d.geometry.coordinates[0]));
+
+    centroidGroup
+      .enter()
+      .append('path')
+      .style('stroke', props.map_stroke_color)
+      .style('stroke-width', props.map_stroke_width)
+      .attr('class', d => `centroid c-${d.properties.slug} level-0`)
+      .merge(centroidGroup)
+      .attr('fill', function(d) {
+        return props.color_scale(
+          numberScale(
+            parseFloat(
+              useData.filter(e => e.countryISO===d.properties.isoAlpha2)[0][props.variable_name]
+            )
+          )
+        );
+      })
+      .attr('d', function(d) {
+        const obj = projection(d.properties.centroid);
+        const o = useData.filter(e => e.countryISO === d.properties.isoAlpha2)[0]
+        if (o) {
+          const value = scaleY(o[props.variable_name]);
+          return 'M' + (obj[0] - props.spike_size) + ' ' + obj[1] + ' L' + obj[0] + ' ' + (obj[1] - value) + ' L' + (obj[0] + props.spike_size) + ' ' + obj[1] + ' ';
+        }
+      });
 
     if (disputed) {
       g.appendSelect('path.disputed')
