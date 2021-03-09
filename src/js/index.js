@@ -61,9 +61,9 @@ class VaccineMap {
     map_fill: 'rgba(153,153,153,0.25)',
     map_stroke_color_active: 'rgba(255, 255, 255, 0.75)',
     spike_color: '#eec331',
-    spike_size: 5,
-    spike_height: 70,
-    min_spike_height: 2,
+    spike_size: 2,
+    spike_height: 30,
+    min_spike_height: 1,
     heightRatio: (width, breakpoint) => (width < breakpoint ? 0.8 : 0.9),
     locale: 'en',
     map_custom_projections: {
@@ -91,6 +91,8 @@ class VaccineMap {
       useWidth: (width, factor) => (width * factor),
       factor: 2.2,
     },
+    boxColor: '#eee',
+    boxOpacity: .4,
     interaction: true,
     variable_name: 'perPopulation',
     // variable_name: 'fullyVaccinatedPerPop',
@@ -184,7 +186,7 @@ class VaccineMap {
       .range([0, 1]);
 
     const scaleY = d3.scaleLinear()
-      .domain([0,1])
+      .domain([0, 1])
       .range([props.min_spike_height,props.spike_height])
 
     const landGroups = g.appendSelect('g.land')
@@ -194,15 +196,14 @@ class VaccineMap {
       .attr('d', path(land));
 
     const filteredCountries = countries.features.filter(d => filteredCountryKeys.includes(d.properties.isoAlpha2));
-    
     const filteredCountriesCentroids = filteredCountries.map(({ properties }) => ({
-        type: 'Feature',
-        properties,
-        geometry: {
-          type: 'Point',
-          coordinates: properties.centroid,
-        },
-      }))
+      type: 'Feature',
+      properties,
+      geometry: {
+        type: 'Point',
+        coordinates: properties.centroid,
+      },
+    }))
     const countryGroups = g.appendSelect('g.countries')
       .style('pointer-events', 'none')
       .style('fill', props.map_fill)
@@ -231,16 +232,44 @@ class VaccineMap {
     const centroidGroup = g.appendSelect('g.centroids')
       .style('pointer-events', 'none')
       .style('fill', props.map_fill)
-      .selectAll('path.centroid')
-      .data(filteredCountriesCentroids.filter(d=>d.geometry.coordinates[0]));
+      .selectAll('g.centroid')
+      .data(filteredCountriesCentroids.filter(d => d.geometry.coordinates[0]));
 
-    centroidGroup
+    const centroidGroupEnter = centroidGroup
       .enter()
-      .append('path')
-      .style('stroke', props.map_stroke_color)
-      .style('stroke-width', props.map_stroke_width)
+      .append('g')
       .attr('class', d => `centroid c-${d.properties.slug} level-0`)
       .merge(centroidGroup)
+      .attr('transform', (d)=>{
+        const obj = projection(d.properties.centroid);
+        return `translate(${obj[0]-props.spike_size},${obj[1]})`;
+      })
+
+    centroidGroupEnter.appendSelect('rect.border-box')
+      .attr('width', props.spike_size*2)
+      .attr('height', props.spike_height)
+      .attr('x', 0)
+      .attr('y', -props.spike_height)
+      .style('opacity', props.boxOpacity)
+      .style('stroke', props.boxColor);
+
+    centroidGroupEnter.appendSelect('rect.fill-box')
+      .attr('width', props.spike_size*2)
+      .attr('height', (d)=>{
+        const o = useData.filter(e => e.countryISO === d.properties.isoAlpha2)[0]
+        if (o) {
+          const value = scaleY(o[props.variable_name]);
+          return value
+        }
+      })
+      .attr('x', 0)
+      .attr('y', (d)=>{
+        const o = useData.filter(e => e.countryISO === d.properties.isoAlpha2)[0]
+        if (o) {
+          const value = scaleY(o[props.variable_name]);
+          return -value;
+        }
+      })
       .attr('fill', function(d) {
         return props.color_scale(
           numberScale(
@@ -250,14 +279,6 @@ class VaccineMap {
           )
         );
       })
-      .attr('d', function(d) {
-        const obj = projection(d.properties.centroid);
-        const o = useData.filter(e => e.countryISO === d.properties.isoAlpha2)[0]
-        if (o) {
-          const value = scaleY(o[props.variable_name]);
-          return 'M' + (obj[0] - props.spike_size) + ' ' + obj[1] + ' L' + obj[0] + ' ' + (obj[1] - value) + ' L' + (obj[0] + props.spike_size) + ' ' + obj[1] + ' ';
-        }
-      });
 
     if (disputed) {
       g.appendSelect('path.disputed')
