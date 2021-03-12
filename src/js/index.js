@@ -60,7 +60,7 @@ class VaccineMap {
     map_highlight_stroke_width: 1.2,
     map_fill: 'rgba(153,153,153,0.25)',
     map_stroke_color_active: 'rgba(255, 255, 255, 0.75)',
-    spike_color: '#eec331',
+    distuted: true,
     heightRatio: (width, breakpoint) => (width < breakpoint ? 0.8 : 0.9),
     locale: 'en',
     map_custom_projections: {
@@ -70,11 +70,8 @@ class VaccineMap {
       scale: null,
       rotate: null,
     },
-    hover_gap: 12.5,
-    getDataRange: (width) => ({ min: 0, max: 1 }),
     color_scale: d3.scaleSequential(d3.interpolateGreens) // Can use a scale as a prop!
       .domain([0, 1]),
-    spike_inactive_opacity: 1,
     disputed_dasharray: [5, 3],
     annotations: {
       name: [],
@@ -92,7 +89,7 @@ class VaccineMap {
     variable_name: 'peopleVaccinatedPerPop',
     // variable_name: 'fullyVaccinatedPerPop',
     radius: {
-      maxRad: 20,
+      maxRad: 15,
       minRad: 0
     }
   };
@@ -189,7 +186,7 @@ class VaccineMap {
       .range([0, 1]);
 
     const scaleY = d3.scaleLinear()
-      .domain([0,1])
+      .domain([0, 1])
       .range([props.min_spike_height,props.spike_height])
 
     const landGroups = g.appendSelect('g.land')
@@ -212,7 +209,7 @@ class VaccineMap {
       .style('pointer-events', 'none')
       .style('fill', props.map_fill)
       .selectAll('path.country')
-      .data(filteredCountries);
+      .data(countries.features);
 
     countryGroups
       .enter()
@@ -221,7 +218,7 @@ class VaccineMap {
       .style('stroke-width', props.map_stroke_width)
       .attr('class', d => `country c-${d.properties.slug} level-0`)
       .merge(countryGroups)
-      .style('opacity',0.3)
+      .style('opacity',1)
       .attr('fill', function(d) {
         return props.color_scale(
           numberScale(
@@ -246,7 +243,7 @@ class VaccineMap {
       .style('stroke-width', props.map_stroke_width)
       .attr('class', d => `centroid c-${d.properties.slug} level-0`)
       .merge(centroidGroup)
-      .style('opacity',.7)
+      .style('opacity',0.7)
       .attr('fill', function(d) {
         return props.color_scale(
           numberScale(
@@ -256,23 +253,22 @@ class VaccineMap {
           )
         );
       })
-      .attr('cx',function(d){
+      .attr('cx', function(d) {
         const obj = projection(d.properties.centroid);
         return obj[0]
       })
-      .attr('cy',function(d){
+      .attr('cy', function(d) {
         const obj = projection(d.properties.centroid);
         return obj[1]
       })
       .attr('r', function(d) {
         const o = useData.filter(e => e.countryISO === d.properties.isoAlpha2)[0]
-        if (o){
+        if (o) {
           return radius(o[props.variable_name]);
-        }
-        
+        };
       });
 
-    if (disputed) {
+    if (props.disputed) {
       g.appendSelect('path.disputed')
         .attr('class', 'disputed level-0')
         .style('pointer-events', 'none')
