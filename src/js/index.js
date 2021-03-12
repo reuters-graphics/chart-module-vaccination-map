@@ -209,7 +209,7 @@ class VaccineMap {
       .style('pointer-events', 'none')
       .style('fill', props.map_fill)
       .selectAll('path.country')
-      .data(countries.features);
+      .data(filteredCountries);
 
     countryGroups
       .enter()
@@ -218,7 +218,7 @@ class VaccineMap {
       .style('stroke-width', props.map_stroke_width)
       .attr('class', d => `country c-${d.properties.slug} level-0`)
       .merge(countryGroups)
-      .style('opacity',1)
+      .style('opacity',.3)
       .attr('fill', function(d) {
         return props.color_scale(
           numberScale(
