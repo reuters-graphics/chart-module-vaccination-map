@@ -92,8 +92,10 @@ class VaccineMap {
       useWidth: (width, factor) => (width * factor),
       factor: 2.2,
     },
+    filter: (d) => (d.vaccinatedPerPopulation > .3),
     interaction: true,
-    variable_name: 'perPopulation',
+    variable_name: 'vaccinatedPerPopulation',
+    disputed: false,
     // variable_name: 'fullyVaccinatedPerPop',
 
   };
@@ -110,11 +112,12 @@ class VaccineMap {
     let useData = data;
     useData.forEach(function(d) {
       d.perPopulation = d.totalDoses/d.population;
+      d.vaccinatedPerPopulation = d.peopleVaccinated/d.population;
       d.fullyVaccinatedPerPop = d.peopleFullyVaccinated/d.population;
     });
 
     useData = useData.filter(d => d[props.variable_name]>0);
-    console.log(useData)
+
     const node = this.selection().node();
     let { width } = node.getBoundingClientRect();
     const ratio = props.heightRatio(width, props.refBox.breakpoint)
@@ -160,7 +163,7 @@ class VaccineMap {
     if (props.map_custom_projections.rotate && props.map_custom_projections.rotate.length === 2) {
       projection.rotate(props.map_custom_projections.rotate);
     }
-    const filteredCountryKeys = useData.map(d => d.countryISO);
+    const filteredCountryKeys = useData.filter(d=>props.filter(d)).map(d => d.countryISO);
 
     // Adding some points in the ocean to create voronoi spaces that will
     // reset the map, so as your cursor traces land masses, you get highlights,
@@ -181,13 +184,18 @@ class VaccineMap {
     const numberScale=d3.scaleLinear()
       .domain(d3.extent(useData, d => parseFloat(d[props.variable_name])))
       .range([0, 1])
+    
     const landGroups = g.appendSelect('g.land')
       .style('pointer-events', 'none')
       .append('path')
       .style('fill', props.map_fill)
       .attr('d', path(land));
-
-    const filteredCountries = countries.features.filter(d =>filteredCountryKeys.includes(d.properties.isoAlpha2))
+    let filteredCountries
+    if (!props.rest) {
+      filteredCountries = countries.features.filter(d => filteredCountryKeys.includes(d.properties.isoAlpha2))
+    } else {
+      filteredCountries = countries.features.filter(d => !filteredCountryKeys.includes(d.properties.isoAlpha2) && d.properties.slug!='antarctica')
+    }
 
     const countryGroups = g.appendSelect('g.countries')
       .style('pointer-events', 'none')
@@ -203,17 +211,20 @@ class VaccineMap {
       .attr('class', d => `country c-${d.properties.slug} level-0`)
       .merge(countryGroups)
       .attr('fill', function(d) {
-        return props.color_scale(
-          numberScale(
-            parseFloat(
-              useData.filter(e => e.countryISO===d.properties.isoAlpha2)[0][props.variable_name]
-            )
-          )
-        );
+        return '#F8E594'
+        // return props.color_scale(
+        //   numberScale(
+        //     parseFloat(
+        //       useData.filter(e => e.countryISO===d.properties.isoAlpha2)[0][props.variable_name]
+        //     )
+        //   )
+        // );
       })
+      .style('stroke','#E7C551')
+      .style('stroke-width','1')
       .attr('d', path);
 
-    if (disputed) {
+    if (props.disputed) {
       g.appendSelect('path.disputed')
         .attr('class', 'disputed level-0')
         .style('pointer-events', 'none')

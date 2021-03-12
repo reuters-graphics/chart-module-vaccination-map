@@ -10,7 +10,11 @@ Follow the notes below! -->
   import chartData from './data.json'
 
   let chart = new VaccineMap();
-  let chartContainer;
+  let chartTwo = new VaccineMap();
+  let chartThree = new VaccineMap();
+
+
+  let chartContainer, chartContainerTwo, chartContainerThree;
 
   // 🎚️ Create variables for any data or props you want users to be able
   // to update in the demo. (And write buttons to update them below!)
@@ -34,6 +38,35 @@ Follow the notes below! -->
       .geo(defaultGeo)
       .props(chartProps) // Pass your chartProps
       .draw(); // 🚀 DRAW IT!
+
+    // 💪 Create a new chart instance of your module.
+    chartTwo = new VaccineMap();
+    // ⚡ And let's use your chart!
+    chartTwo
+      .selection(chartContainerTwo)
+      .data(chartData) // Pass your chartData
+      .geo(defaultGeo)
+      .props({
+         filter: (d) => (d.vaccinatedPerPopulation <= .3 && d.vaccinatedPerPopulation >.1),
+         heightRatio: (width, breakpoint) => (width < breakpoint ? 0.5 : 0.4),
+          mobile: false,
+      }) // Pass your chartProps
+      .draw(); // 🚀 DRAW IT!
+
+    // 💪 Create a new chart instance of your module.
+    chartThree = new VaccineMap();
+    // ⚡ And let's use your chart!
+    chartThree
+      .selection(chartContainerThree)
+      .data(chartData) // Pass your chartData
+      .geo(defaultGeo)
+      .props({
+         filter: (d) => d.vaccinatedPerPopulation >= .1,
+         heightRatio: (width, breakpoint) => (width < breakpoint ? 0.5 : 0.4),
+          mobile: false,
+          rest: true,
+      }) // Pass your chartProps
+      .draw(); // 🚀 DRAW IT!
   });
 
 </script>
@@ -47,7 +80,14 @@ Follow the notes below! -->
   }
 </style>
 
-<div id="vaccine-map-container" bind:this={chartContainer} />
+<div id="vaccine-map-container">
+  <div id="chart-1" bind:this={chartContainer}></div>
+  <div id="chart-2" bind:this={chartContainerTwo}></div>
+  <div id="chart-3" bind:this={chartContainerThree}></div>
+
+
+</div>
+
 
 <div class="chart-options">
   <!-- ✏️ Create buttons that update your data/props variables when they're clicked! -->
