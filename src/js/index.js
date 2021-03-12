@@ -61,9 +61,6 @@ class VaccineMap {
     map_fill: 'rgba(153,153,153,0.25)',
     map_stroke_color_active: 'rgba(255, 255, 255, 0.75)',
     spike_color: '#eec331',
-    spike_size: 5,
-    spike_height: 70,
-    min_spike_height: 2,
     heightRatio: (width, breakpoint) => (width < breakpoint ? 0.8 : 0.9),
     locale: 'en',
     map_custom_projections: {
@@ -92,9 +89,12 @@ class VaccineMap {
       factor: 2.2,
     },
     interaction: true,
-    variable_name: 'perPopulation',
+    variable_name: 'peopleVaccinatedPerPop',
     // variable_name: 'fullyVaccinatedPerPop',
-
+    radius: {
+      maxRad: 20,
+      minRad: 0
+    }
   };
 
   /**
@@ -109,6 +109,7 @@ class VaccineMap {
     let useData = data;
     useData.forEach(function(d) {
       d.perPopulation = d.totalDoses / d.population;
+      d.peopleVaccinatedPerPop = d.peopleVaccinated / d.population;
       d.fullyVaccinatedPerPop = d.peopleFullyVaccinated / d.population;
     });
 
@@ -127,6 +128,10 @@ class VaccineMap {
       this.selection().classed('mobile', false);
       height = width * ratio;
     }
+
+    const radius = d3.scaleSqrt()
+      .range([props.radius.minRad, props.radius.maxRad])
+      .domain([0, d3.max(data, d => d[props.variable_name])])
 
     // SVG begins here
     const svg = this.selection()
@@ -194,15 +199,15 @@ class VaccineMap {
       .attr('d', path(land));
 
     const filteredCountries = countries.features.filter(d => filteredCountryKeys.includes(d.properties.isoAlpha2));
-    
+
     const filteredCountriesCentroids = filteredCountries.map(({ properties }) => ({
-        type: 'Feature',
-        properties,
-        geometry: {
-          type: 'Point',
-          coordinates: properties.centroid,
-        },
-      }))
+      type: 'Feature',
+      properties,
+      geometry: {
+        type: 'Point',
+        coordinates: properties.centroid,
+      },
+    }));
     const countryGroups = g.appendSelect('g.countries')
       .style('pointer-events', 'none')
       .style('fill', props.map_fill)
@@ -216,7 +221,7 @@ class VaccineMap {
       .style('stroke-width', props.map_stroke_width)
       .attr('class', d => `country c-${d.properties.slug} level-0`)
       .merge(countryGroups)
-      .style('opacity',.3)
+      .style('opacity',0.3)
       .attr('fill', function(d) {
         return props.color_scale(
           numberScale(
@@ -231,16 +236,17 @@ class VaccineMap {
     const centroidGroup = g.appendSelect('g.centroids')
       .style('pointer-events', 'none')
       .style('fill', props.map_fill)
-      .selectAll('path.centroid')
+      .selectAll('circle.centroid')
       .data(filteredCountriesCentroids.filter(d=>d.geometry.coordinates[0]));
 
     centroidGroup
       .enter()
-      .append('path')
+      .append('circle')
       .style('stroke', props.map_stroke_color)
       .style('stroke-width', props.map_stroke_width)
       .attr('class', d => `centroid c-${d.properties.slug} level-0`)
       .merge(centroidGroup)
+      .style('opacity',.7)
       .attr('fill', function(d) {
         return props.color_scale(
           numberScale(
@@ -250,13 +256,20 @@ class VaccineMap {
           )
         );
       })
-      .attr('d', function(d) {
+      .attr('cx',function(d){
         const obj = projection(d.properties.centroid);
+        return obj[0]
+      })
+      .attr('cy',function(d){
+        const obj = projection(d.properties.centroid);
+        return obj[1]
+      })
+      .attr('r', function(d) {
         const o = useData.filter(e => e.countryISO === d.properties.isoAlpha2)[0]
-        if (o) {
-          const value = scaleY(o[props.variable_name]);
-          return 'M' + (obj[0] - props.spike_size) + ' ' + obj[1] + ' L' + obj[0] + ' ' + (obj[1] - value) + ' L' + (obj[0] + props.spike_size) + ' ' + obj[1] + ' ';
+        if (o){
+          return radius(o[props.variable_name]);
         }
+        
       });
 
     if (disputed) {
