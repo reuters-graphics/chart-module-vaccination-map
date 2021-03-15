@@ -6,8 +6,8 @@ Follow the notes below! -->
   import Docs from './App/Docs.svelte';
   import Explorer from './App/Explorer.svelte';
   import VaccineMap from '../js/index';
-  import topo from './topo.json'
-  import chartData from './data.json'
+  import topo from './topo.json';
+  // import chartData from './data.json'
 
   let chart = new VaccineMap();
   let chartContainer;
@@ -15,6 +15,7 @@ Follow the notes below! -->
   // 🎚️ Create variables for any data or props you want users to be able
   // to update in the demo. (And write buttons to update them below!)
   let defaultGeo = topo
+  let chartData = null;
 
   // ...
 
@@ -24,10 +25,17 @@ Follow the notes below! -->
       heightRatio: (width, breakpoint) => (width < breakpoint ? 0.5 : 0.4), 
   };
 
-  afterUpdate(() => {
+  const fetchData = async() => {
+    const res = await fetch('https://graphics.thomsonreuters.com/data/2020/coronavirus/owid-covid-vaccinations/latest-perpop-data-all.json');
+    chartData = await res.json();
+  };
+
+  afterUpdate(async() => {
+    if (!chartData) await fetchData();
     // 💪 Create a new chart instance of your module.
     chart = new VaccineMap();
     // ⚡ And let's use your chart!
+    
     chart
       .selection(chartContainer)
       .data(chartData) // Pass your chartData
