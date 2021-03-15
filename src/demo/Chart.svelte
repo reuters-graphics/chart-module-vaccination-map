@@ -51,14 +51,7 @@ Follow the notes below! -->
 
 <div class="chart-options">
   <!-- ✏️ Create buttons that update your data/props variables when they're clicked! -->
-  <button
-    on:click={() => {
-      chartData = getRandomData();
-    }}>New data</button>
-  <button
-    on:click={() => {
-      circleFill = circleFill === 'orange' ? 'steelblue' : 'orange';
-    }}>Change fill</button>
+
 </div>
 
 <!-- ⚙️ These components will automatically create interactive documentation for you chart! -->

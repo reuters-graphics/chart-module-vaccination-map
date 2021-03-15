@@ -4,7 +4,23 @@
 $VaccineMap-container: '#vaccine-map-container' !default;
 
 #{$VaccineMap-container} {
+  position: relative;
   /* Write your chart styles here */
+  div.key {
+    font-family: $font-family-sans-serif;
+    color: rgba(255,255,255,0.5);
+    font-size: 0.8rem;
+    line-height: 0.9rem;
+    text-align: center;
+  }
+  svg.key {
+    text {
+      font-family: $font-family-sans-serif;
+      fill: $gray-400;
+      text-anchor: middle;
+      font-size: 0.8rem;
+    }
+  }
   .axis {
     pointer-events: none;
     text {
@@ -23,4 +39,32 @@ $VaccineMap-container: '#vaccine-map-container' !default;
       display: none;
     }
   }
+
+  circle.pulse{
+    fill-opacity: 0;
+    animation-duration: 1.5s;
+    animation-name: pulse;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-out;
+    transform-box:fill-box;
+    transform-origin: 50% 50%;
+  }
+
+  @keyframes pulse {
+    0% {
+      // stroke-width: 1px;
+      // opacity: 1;
+      stroke-opacity: 0;
+      fill-opacity: 0.8;
+      transform: scale(0);
+    }
+    100% {
+      // stroke-width: 1px;
+      // opacity: 0;
+      fill-opacity: 0;
+      stroke-opacity: 0.1;
+      transform: scale(1);
+    }
+  }
 }
+

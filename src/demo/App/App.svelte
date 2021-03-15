@@ -3,7 +3,7 @@ import Nav from './Nav.svelte';
 import ChartContainer from './ChartContainer.svelte';
 import Chart from '../Chart.svelte';
 
-let width = '';
+let width = 'widest';
 let setWidth = (w) => { width = w; };
 
 </script>
