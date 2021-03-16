@@ -59,211 +59,211 @@ class VaccineMap {
    * functions that can get properties from your data.
    */
   defaultProps = {
-    map_stroke_width: .5,
-    map_stroke_color: '#2f353f',
-    map_highlight_stroke_width: 1.2,
-    map_fill: 'rgba(153,153,153,0.25)',
-    map_stroke_color_active: 'rgba(255, 255, 255, 0.75)',
-    spike_color: '#eec331',
     heightRatio: (width, breakpoint) => (width < breakpoint ? 0.8 : 0.5),
     locale: 'en',
-    map_custom_projections: {
-      clip_box: [[-130, 70], [194, -39]],
-      projection: 'geoNaturalEarth1',
-      center: null,
-      scale: null,
-      rotate: null,
-    },
-    hover_gap: 12.5,
     getDataRange: (width) => ({ min: 0, max: 1 }),
-    color_scale: d3.scaleSequential(d3.interpolateGreens) // Can use a scale as a prop!
-      .domain([0, 1]),
-    spike_inactive_opacity: 1,
-    disputed_dasharray: [5, 3],
-    annotations: {
-      name: [],
-      value: [],
+    borders: {
+      strokeColor: '#2f353f',
+      strokeWidth: 0.5,
+      disputedBorders: {
+        show: false,
+        strokeColor: '#2f353f',
+        strokeWidth: 0.5,
+        dasharray: [5, 5],
+      },
     },
-    mobile: true,
-    refBox: {
-      height: 90,
-      width: 180,
-      breakpoint: 900,
-      useWidth: (width, factor) => (width * factor),
-      factor: 2.2,
+    globe: {
+      strokeColor: 'rgba(255, 255, 255, 0.5)',
+      strokeWidth: 0.1,
+      landFill: 'rgba(153,153,153,0.25)',
+      verticalAxisTilt: 15,
+      colorFill: '#22BD3B'
     },
     interaction: true,
-    variable_name: 'perPopulation',
-    // variable_name: 'fullyVaccinatedPerPop',
+    variableName: 'perPopulation',
+    spin: true,
+    spinSpeed: 12000,
+    spinToSpeed: 750,
+    topology: {
+      getCountryFeatures: (topology) => topology.objects.countries,
+      getIsoAlpha3Property: (properties) => properties.isoAlpha3,
+      getDisputedBorderFeatures: (topology) => topology.objects.disputedBoundaries,
+      getLandFeatures: (topology) => topology.objects.land,
+    },
 
   };
+
+  _rotation = [0, 0];
+
+  _drawSphere() {
+    const { globe } = this.props();
+    this._context.beginPath();
+    this._path({ type: 'Sphere' });
+    this._context.strokeStyle = globe.strokeColor;
+    this._context.lineWidth = globe.strokeWidth;
+    this._context.stroke();
+  }
+  
+  _drawLand() {
+    const { globe } = this.props();
+    this._context.beginPath();
+    this._path(this._land);
+    this._context.fillStyle = globe.landFill;
+    this._context.fill();
+  }
+
+  _drawBorders() {
+    const { borders } = this.props();
+    if (borders.disputedBorders.show) this._drawDisputedBorders();
+  }
+
+  _drawDisputedBorders() {
+    const { borders } = this.props();
+    const { disputedBorders } = borders;
+    this._context.beginPath();
+    this._path(this._disputedBorders);
+    this._context.setLineDash(disputedBorders.dasharray);
+    this._context.strokeStyle = disputedBorders.strokeColor;
+    this._context.lineWidth = disputedBorders.strokeWidth;
+    this._context.stroke();
+    this._context.setLineDash([]);
+  }
+
+  _drawCountries(country, value, all) {
+    const { globe } = all.props();
+    all._context.beginPath();
+    all._path(country);
+    all._context.fillStyle = globe.colorFill;
+    all._context.globalAlpha = value;
+    all._context.fill();
+  }
+
 
   /**
    * Write all your code to draw your chart in this function!
    * Remember to use appendSelect!
    */
+
+
   draw() {
-    const data = this.data();
     const props = this.props();
-    const topo = this.geo();
-    if (!topo) return this;
-    let useData = data;
+    const topology = this.geo();
+    if (!topology) return this;
+
+    const countriesFeatures = props.topology.getCountryFeatures(topology);
+    const disputedBoundariesFeatures = props.topology.getDisputedBorderFeatures(topology);
+    const landFeatures = props.topology.getLandFeatures(topology);
+    const node = this.selection().node();
+    const sphere = { type: 'Sphere' };
+    const { width } = node.getBoundingClientRect();
+    const projection = d3.geoOrthographic().fitExtent([[10, 10], [width - 10, width - 10]], sphere);
+    let useData = this.data();
     useData.forEach(function(d) {
       d.perPopulation = d.totalDoses/d.population;
       d.fullyVaccinatedPerPop = d.peopleFullyVaccinated/d.population;
     });
 
-    useData = useData.filter(d => d[props.variable_name]>0);
-    console.log(useData)
-    const node = this.selection().node();
-    let { width } = node.getBoundingClientRect();
-    const ratio = props.heightRatio(width, props.refBox.breakpoint)
-    let useWidth, height;
-    if (width < props.refBox.breakpoint && props.mobile) {
-      useWidth = props.refBox.useWidth(width,props.refBox.factor);
-      this.selection().classed('mobile', true);
-      height = useWidth * 0.5;
-    } else {
-      useWidth = width;
-      this.selection().classed('mobile', false);
-      height = width * ratio;
-    }
-
-    // SVG begins here
-    const svg = this.selection()
-      .appendSelect('div.chart-container-div')
-      .attr('id', 'map-container')
-      .style('overflow-x', 'scroll')
-      .appendSelect('svg.chart') // see docs in ./utils/d3.js
-      .attr('width', useWidth)
-      .attr('height', height);
-
-    const g = svg.appendSelect('g');
-
-    if (!d3[props.map_custom_projections.projection]) {
-      props.map_custom_projections.projection = 'geoNaturalEarth1';
-    }
-
-    const projection = d3[props.map_custom_projections.projection]();
-    const countries = topojson.feature(topo, topo.objects.countries);
-    const land = topojson.feature(topo, topo.objects.land);
-
-    let disputed;
-    if (topo.objects.disputedBoundaries) {
-      disputed = topojson.mesh(topo, topo.objects.disputedBoundaries);  
-    }
-
-    if (props.map_custom_projections.center && props.map_custom_projections.center.length === 2) {
-      projection.center(props.map_custom_projections.center);
-    }
-
-    if (props.map_custom_projections.rotate && props.map_custom_projections.rotate.length === 2) {
-      projection.rotate(props.map_custom_projections.rotate);
-    }
+    useData = useData.filter(d => d[props.variableName]>0);
     const filteredCountryKeys = useData.map(d => d.countryISO);
-
-    // Adding some points in the ocean to create voronoi spaces that will
-    // reset the map, so as your cursor traces land masses, you get highlights,
-    // but in the ocean you can see the whole world picture...
-
-    if (props.map_custom_projections.clip_box && (props.map_custom_projections.clip_box.length === 2 && props.map_custom_projections.clip_box[0].length === 2 && props.map_custom_projections.clip_box[1].length === 2)) {
-      projection.fitSize([useWidth, height], makeRangeBox(props.map_custom_projections.clip_box));
-    } else {
-      projection.fitSize([useWidth, height], countries);
-    }
-
-    if (props.map_custom_projections.scale) {
-      projection.scale(props.map_custom_projections.scale);
-    }
-
-    const path = d3.geoPath().projection(projection);
-    svg.selectAll('.country,.disputed,.land').remove();
-    const numberScale=d3.scaleLinear()
-      .domain(d3.extent(useData, d => parseFloat(d[props.variable_name])))
-      .range([0, 1])
-    const landGroups = g.appendSelect('g.land')
-      .style('pointer-events', 'none')
-      .append('path')
-      .style('fill', props.map_fill)
-      .attr('d', path(land));
-
+    this._disputedBorders = topojson.mesh(topology, disputedBoundariesFeatures);
+    this._land = topojson.feature(topology, landFeatures);
+    const countries = topojson.feature(topology, countriesFeatures);
     const filteredCountries = countries.features.filter(d =>filteredCountryKeys.includes(d.properties.isoAlpha2))
+    const numberScale=d3.scaleLinear()
+      .domain(d3.extent(useData, d => parseFloat(d[props.variableName])))
+      .range([0, 1])
+    const canvas = this.selection().appendSelect('canvas')
+      .attr('width', width * 2)
+      .attr('height', width * 2)
+      .style('width', `${width}px`)
+      .style('height', `${width}px`);
 
-    const countryGroups = g.appendSelect('g.countries')
-      .style('pointer-events', 'none')
-      .style('fill', props.map_fill)
-      .selectAll('path.country')
-      .data(filteredCountries);
+    projection.rotate(this._rotation);
 
-    countryGroups
-      .enter()
-      .append('path')
-      .style('stroke', props.map_stroke_color)
-      .style('stroke-width', props.map_stroke_width)
-      .attr('class', d => `country c-${d.properties.slug} level-0`)
-      .merge(countryGroups)
-      .attr('fill', function(d) {
-        return props.color_scale(
-          numberScale(
+    this._context = canvas.node().getContext('2d');
+    this._context.scale(2, 2);
+    this._path = d3.geoPath(projection, this._context);
+
+    let destination = [];
+
+    const geoPath = d3.geoPath(
+      d3.geoOrthographic()
+        .fitExtent([[10, 10], [width - 10, width - 10]], sphere)
+        .rotate([-destination[0], props.globe.verticalAxisTilt - destination[1]]),
+      this._context
+    );
+    const dC = this._drawCountries
+    const drawMap = (projectedCentroid) => {
+      this._context.clearRect(0, 0, width, width);
+      this._drawLand();
+      this._drawBorders();
+      const all = this
+      filteredCountries.forEach(function(d){
+        const val = numberScale(
             parseFloat(
-              useData.filter(e => e.countryISO===d.properties.isoAlpha2)[0][props.variable_name]
+              useData.filter(e => e.countryISO===d.properties.isoAlpha2)[0][props.variableName]
             )
           )
-        );
+        dC(d, val, all)
       })
-      .attr('d', path);
+      this._context.globalAlpha = 1;
+      this._drawSphere();
+    };
 
-    if (disputed) {
-      g.appendSelect('path.disputed')
-        .attr('class', 'disputed level-0')
-        .style('pointer-events', 'none')
-        .style('stroke', props.map_stroke_color)
-        .style('stroke-width', props.map_stroke_width)
-        .style('fill', 'none')
-        .style('stroke-dasharray', props.disputed_dasharray)
-        .attr('d', path(disputed));
+    const rotateToPoint = () => {
+      const interpolator = d3.interpolate(projection.rotate(), [-destination[0], props.globe.verticalAxisTilt - destination[1]]);
+      canvas.transition()
+        .duration(props.spinToSpeed)
+        .tween('rotate', () =>
+          (t) => {
+            projection.rotate(interpolator(t));
+            const projectedCentroid = projection(destination);
+            drawMap(projectedCentroid);
+            this._rotation = projection.rotate();
+          }
+        );
+    };
+
+    let lastElapsed = 0;
+    const rotate = (elapsed, phiInterpolator) => {
+      const scale = d3.scaleLinear()
+        .domain([0, props.spinSpeed])
+        .range([0, 360]);
+      const step = scale(elapsed - lastElapsed);
+
+      const phi = phiInterpolator(Math.min(elapsed / props.spinToSpeed, 1));
+      projection.rotate([this._rotation[0] + step, phi]);
+      const projectedCentroid = projection(destination);
+      drawMap(projectedCentroid);
+      this._rotation = projection.rotate();
+      lastElapsed = elapsed;
+    };
+
+    const resetTimer = () => {
+      this._timer.stop();
+      this._timer = null;
+    };
+
+    if (!props.spin) {
+      if (this._timer) resetTimer();
+      rotateToPoint();
+    } else {
+      if (this._timer) resetTimer();
+      const phiInterpolator = d3.interpolate(this._rotation[1], props.globe.verticalAxisTilt - destination[1]);
+      this._timer = d3.timer((elapsed) => {
+        if (!props.spin) {
+          resetTimer();
+          return;
+        }
+        rotate(elapsed, phiInterpolator);
+      });
     }
+
+
 
     return this;
   }
 }
 
-function makeRangeBox(opts) {
-  var lon0 = opts[0][0];
-  var lon1 = opts[1][0];
-  var lat0 = opts[0][1];
-  var lat1 = opts[1][1];
-
-  // to cross antimeridian w/o ambiguity
-  if (lon0 > 0 && lon1 < 0) {
-    lon1 += 360;
-  }
-
-  // to make lat span unambiguous
-  if (lat0 > lat1) {
-    var tmp = lat0;
-    lat0 = lat1;
-    lat1 = tmp;
-  }
-
-  var dlon4 = (lon1 - lon0) / 4;
-
-  return {
-    type: 'Polygon',
-    coordinates: [[
-      [lon0, lat0],
-      [lon0, lat1],
-      [lon0 + dlon4, lat1],
-      [lon0 + 2 * dlon4, lat1],
-      [lon0 + 3 * dlon4, lat1],
-      [lon1, lat1],
-      [lon1, lat0],
-      [lon1 - dlon4, lat0],
-      [lon1 - 2 * dlon4, lat0],
-      [lon1 - 3 * dlon4, lat0],
-      [lon0, lat0],
-    ]],
-  };
-}
 
 export default VaccineMap;
