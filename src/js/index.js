@@ -165,6 +165,10 @@ class VaccineMap {
 
 
   draw() {
+    if (window.globeTimer){
+      window.globeTimer.stop();
+      window.globeTimer = null;
+    }
     const props = this.props();
     const topology = this.geo();
     if (!topology) return this;
@@ -228,6 +232,7 @@ class VaccineMap {
     this._context = canvas.node().getContext('2d');
     this._context.scale(2, 2);
     this._path = d3.geoPath(projection, this._context);
+    this._pathCheck = d3.geoPath(projection);
     
 
     let selectedCountry = filteredCountriesRandom[Math.floor(Math.random() * filteredCountriesRandom.length)]
@@ -307,8 +312,13 @@ class VaccineMap {
     //   });
     // }
 
+
     const loopCountries = () => {
       selectedCountry = filteredCountriesRandom[Math.floor(Math.random() * filteredCountriesRandom.length)]
+      chosenCountry()
+    }
+
+    const chosenCountry = () => {
       destination = selectedCountry.properties.centroid;
       const projectedCentroid = projection(destination);
       drawMap(projectedCentroid, selectedCountry);
@@ -318,24 +328,46 @@ class VaccineMap {
       sentence.select('.country').text(selectedCountry.properties.name)
       sentence.select('.percent').text(parseInt((useData.filter(d=>d.countryISO===selectedCountry.properties.isoAlpha2)[0][props.variableName])*10000)/100+'%')
     }
+
+    const onClickSelect = (event) => {
+
+      let clickedPoint = projection.invert(d3.pointer(event));
+      let options = []
+
+      for (let i = 0; i < filteredCountries.length; i++){
+        if (this._pathCheck({type: 'Point', coordinates: filteredCountries[i].properties.centroid})){
+          options.push(filteredCountries[i])
+        }
+      }
+      let chosenObj
+      for (let i = 0; i<options.length; i++){
+        if (d3.geoContains(options[i], clickedPoint)){
+          selectedCountry = options[i]
+          break;
+        }
+      }
+      d3.selectAll('.line, .sentence').classed('hide', false)
+
+      chosenCountry(chosenObj)
+    }
     
     const drawBasic = () => {
       drawMap();
     }
     
     const resetTimer = () => {
-      if (this._timer){
-        this._timer.stop();
-        this._timer = null;
+      if (window.globeTimer){
+        window.globeTimer.stop();
+        window.globeTimer = null;
       }
     };
 
-    if (this._timer) {
+    if (window.globeTimer) {
       resetTimer()
-      this._timer = d3.interval(loopCountries, props.rotateChange);
+      window.globeTimer = d3.interval(loopCountries, props.rotateChange);
     } else {
       loopCountries()
-      this._timer = d3.interval(loopCountries, props.rotateChange);
+      window.globeTimer = d3.interval(loopCountries, props.rotateChange);
     };
 
     function drag(projection) {
@@ -365,9 +397,11 @@ class VaccineMap {
         resetTimer()
         v0 = versor.cartesian(projection.invert(pointer(event, this)));
         q0 = versor(r0 = projection.rotate());
+        
       }
 
       function dragged(event) {
+        d3.selectAll('.line, .sentence').classed('hide', true)
         const p = pointer(event, this);
         const v1 = versor.cartesian(projection.rotate(r0).invert(p));
         const delta = versor.delta(v0, v1);
@@ -394,6 +428,9 @@ class VaccineMap {
 
     canvas
       .call(drag(projection).on("drag.render", drawBasic))
+      .on('click', (event) => {
+        onClickSelect(event)
+      })
 
     
     //   const phiInterpolator = d3.interpolate(this._rotation[1], props.globe.verticalAxisTilt - destination[1]);

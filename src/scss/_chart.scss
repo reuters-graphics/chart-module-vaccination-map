@@ -10,7 +10,11 @@ $VaccineMap-container: '#vaccine-map-container' !default;
     cursor:    -moz-grabbing;
     cursor:         grabbing;
   }
-
+  .line,.sentence{
+    &.hide{
+      opacity: 0;
+    }
+  }
   canvas{
     cursor: -webkit-grab;
     cursor:    -moz-grab;
