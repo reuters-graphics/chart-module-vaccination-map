@@ -1537,6 +1537,16 @@ d3-hierarchy@2:
   resolved "https://registry.yarnpkg.com/d3-hierarchy/-/d3-hierarchy-2.0.0.tgz#dab88a58ca3e7a1bc6cab390e89667fcc6d20218"
   integrity sha512-SwIdqM3HxQX2214EG9GTjgmCc/mbSx4mQBn+DuEETubhOw6/U3fmnji4uCVrmzOydMHSO1nZle5gh6HB/wdOzw==
 
+d3-inertia@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/d3-inertia/-/d3-inertia-0.4.0.tgz#c2d097d6632937c0ed3021ed38c93d47484a91b3"
+  integrity sha512-FNo13XWrBL5EGPcUhwOGFL+PKpnFCUwTeJ0X7wUxP2e7EmLp9+q+MW4AwlTMT2aF8BU/K/Jgaugy/RBPx/1cXA==
+  dependencies:
+    d3-drag "2"
+    d3-selection "2"
+    d3-timer "2"
+    versor "^0.1"
+
 d3-interpolate@1:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/d3-interpolate/-/d3-interpolate-1.4.0.tgz#526e79e2d80daa383f9e0c1c1c7dcc0f0583e987"
@@ -2625,6 +2635,11 @@ ms@2.1.2:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.2.tgz#d09d1f357b443f493382a8eb3ccd183872ae6009"
   integrity sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==
 
+mustache@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/mustache/-/mustache-4.1.0.tgz#8c1b042238a982d2eb2d30efc6c14296ae3f699d"
+  integrity sha512-0FsgP/WVq4mKyjolIyX+Z9Bd+3WS8GOwoUTyKXT5cTYMGeauNTi2HPCwERqseC1IHAy0Z7MDZnJBfjabd4O8GQ==
+
 nanoid@^3.1.20:
   version "3.1.20"
   resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.1.20.tgz#badc263c6b1dcf14b71efaa85f6ab4c1d6cfc788"
@@ -3443,6 +3458,11 @@ validate-npm-package-license@^3.0.1:
   dependencies:
     spdx-correct "^3.0.0"
     spdx-expression-parse "^3.0.0"
+
+versor@^0.1, versor@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/versor/-/versor-0.1.2.tgz#0b145a22cd6376f222dace214ab1fd3b6369a8d9"
+  integrity sha512-/XNJOGXeis3j7OOOkdTp3LXzWDTxo/33wvYNtXLLbNOZ5lkTgESzTMPeThU6albr14UupCottC6KTXjcGDO0Lg==
 
 which-boxed-primitive@^1.0.1:
   version "1.0.2"

@@ -23,17 +23,20 @@
     "lint": "yarn lint:js && yarn lint:scss && yarn lint:svelte"
   },
   "dependencies": {
-    "@reuters-graphics/graphics-atlas-client": "^0.5.0",
+    "@reuters-graphics/graphics-atlas-client": "^0.5.2",
     "d3": "^6.2.0",
     "d3-appendselect": "^0.1.0",
     "d3-array": "^2.11.0",
     "d3-axis": "^2.0.0",
     "d3-geo": "^2.0.1",
     "d3-geo-voronoi": "^1.6.0",
+    "d3-inertia": "^0.4.0",
     "d3-scale": "^3.2.3",
     "d3-selection": "^2.0.0",
     "lodash": "^4.17.20",
-    "topojson-client": "^3.1.0"
+    "mustache": "^4.1.0",
+    "topojson-client": "^3.1.0",
+    "versor": "^0.1.2"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",

@@ -4,6 +4,18 @@
 $VaccineMap-container: '#vaccine-map-container' !default;
 
 #{$VaccineMap-container} {
+  position: relative;
+  canvas:active{
+    cursor: -webkit-grabbing;
+    cursor:    -moz-grabbing;
+    cursor:         grabbing;
+  }
+
+  canvas{
+    cursor: -webkit-grab;
+    cursor:    -moz-grab;
+    cursor:         grab;
+  }
   /* Write your chart styles here */
   .axis {
     pointer-events: none;
@@ -22,5 +34,19 @@ $VaccineMap-container: '#vaccine-map-container' !default;
     path.domain {
       display: none;
     }
+  }
+  .sentence{
+    font-size: 1.3rem;
+    line-height: 1.8rem;
+    color: white;
+    font-weight: 100;
+    text-align: center;
+    .country, .percent{
+      font-weight: 600;
+    }
+  }
+
+  .line{
+    position: absolute;
   }
 }

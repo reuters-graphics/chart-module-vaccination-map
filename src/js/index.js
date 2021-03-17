@@ -5,6 +5,9 @@ import merge from 'lodash/merge';
 import * as topojson from 'topojson-client';
 import AtlasMetadataClient from '@reuters-graphics/graphics-atlas-client';
 import * as d3 from 'd3';
+import versor from 'versor/src/index.js';
+import Mustache from 'mustache';
+// import * as inertia from 'd3-inertia'
 // import { geoVoronoi } from 'd3-geo-voronoi';
 
 d3.selection.prototype.appendSelect = appendSelect;
@@ -77,16 +80,22 @@ class VaccineMap {
       strokeWidth: 0.1,
       landFill: 'rgba(153,153,153,0.25)',
       verticalAxisTilt: 15,
-      colorFill: '#22BD3B'
+      colorFill: '#22BD3B',
+      highlight: {
+        strokeColor: 'white',
+        strokeWidth: 1.5,
+        opacity: .5
+      }
     },
     interaction: true,
     variableName: 'perPopulation',
-    spin: true,
+    spin: false,
     spinSpeed: 12000,
     spinToSpeed: 750,
+    rotateChange: 3500,
+    sentence: "<span class='country'> {{ countryName }}</span> has vaccinated atleast <span class='percent'>58%</span> of its population.",
     topology: {
       getCountryFeatures: (topology) => topology.objects.countries,
-      getIsoAlpha3Property: (properties) => properties.isoAlpha3,
       getDisputedBorderFeatures: (topology) => topology.objects.disputedBoundaries,
       getLandFeatures: (topology) => topology.objects.land,
     },
@@ -129,13 +138,23 @@ class VaccineMap {
     this._context.setLineDash([]);
   }
 
-  _drawCountries(country, value, all) {
+
+
+  _drawCountries(country, all, highlight) {
     const { globe } = all.props();
+
     all._context.beginPath();
     all._path(country);
     all._context.fillStyle = globe.colorFill;
-    all._context.globalAlpha = value;
+    all._context.globalAlpha = country.val;
     all._context.fill();
+    
+    if (highlight){
+      all._context.globalAlpha = globe.highlight.opacity;
+      all._context.strokeStyle = globe.highlight.strokeColor;
+      all._context.lineWidth = globe.highlight.strokeWidth;
+      all._context.stroke();
+    }
   }
 
 
@@ -172,20 +191,49 @@ class VaccineMap {
     const numberScale=d3.scaleLinear()
       .domain(d3.extent(useData, d => parseFloat(d[props.variableName])))
       .range([0, 1])
+    
+    filteredCountries.forEach(function(d){
+      d.val = numberScale(
+            parseFloat(
+              useData.filter(e => e.countryISO===d.properties.isoAlpha2)[0][props.variableName]
+            )
+          )
+    })
+    const filteredCountriesRandom = filteredCountries.filter(d => d.val>0.01)
+
+    
+
+    const sentence = this.selection().appendSelect('div.sentence')
+      .html(Mustache.render(props.sentence, { countryName: 'Israel', percent: '58%' }))
+
+    sentence.selectAll('.country, .percent').style('color',props.globe.colorFill)
+      .style('border-bottom',`${props.globe.colorFill} 1px solid`)
+
     const canvas = this.selection().appendSelect('canvas')
       .attr('width', width * 2)
       .attr('height', width * 2)
       .style('width', `${width}px`)
       .style('height', `${width}px`);
 
+    this.selection().appendSelect('div.line')
+      .style('background', props.globe.highlight.strokeColor)
+      .style('top', `${sentence.node().getBoundingClientRect().height}px`)
+      .style('left', `${width/2}px`)
+      .style('height',`${(width/2)*.735}px`)
+      .style('width','1px')
+
+
     projection.rotate(this._rotation);
 
     this._context = canvas.node().getContext('2d');
     this._context.scale(2, 2);
     this._path = d3.geoPath(projection, this._context);
+    
 
+    let selectedCountry = filteredCountriesRandom[Math.floor(Math.random() * filteredCountriesRandom.length)]
+    
     let destination = [];
-
+    destination = selectedCountry.properties.centroid;
     const geoPath = d3.geoPath(
       d3.geoOrthographic()
         .fitExtent([[10, 10], [width - 10, width - 10]], sphere)
@@ -193,19 +241,19 @@ class VaccineMap {
       this._context
     );
     const dC = this._drawCountries
-    const drawMap = (projectedCentroid) => {
+    const drawMap = (projectedCentroid, highlighted) => {
       this._context.clearRect(0, 0, width, width);
       this._drawLand();
       this._drawBorders();
       const all = this
       filteredCountries.forEach(function(d){
-        const val = numberScale(
-            parseFloat(
-              useData.filter(e => e.countryISO===d.properties.isoAlpha2)[0][props.variableName]
-            )
-          )
-        dC(d, val, all)
+        if (d===highlighted){
+          dC(d, all, true)
+        } else {
+          dC(d, all)
+        }
       })
+
       this._context.globalAlpha = 1;
       this._drawSphere();
     };
@@ -218,7 +266,7 @@ class VaccineMap {
           (t) => {
             projection.rotate(interpolator(t));
             const projectedCentroid = projection(destination);
-            drawMap(projectedCentroid);
+            drawMap(projectedCentroid, selectedCountry);
             this._rotation = projection.rotate();
           }
         );
@@ -234,32 +282,128 @@ class VaccineMap {
       const phi = phiInterpolator(Math.min(elapsed / props.spinToSpeed, 1));
       projection.rotate([this._rotation[0] + step, phi]);
       const projectedCentroid = projection(destination);
-      drawMap(projectedCentroid);
+      drawMap(projectedCentroid, selectedCountry);
       this._rotation = projection.rotate();
       lastElapsed = elapsed;
     };
 
+    // const resetTimer = () => {
+    //   this._timer.stop();
+    //   this._timer = null;
+    // };
+
+    // if (!props.spin) {
+    //   if (this._timer) resetTimer();
+    //   rotateToPoint();
+    // } else {
+    //   if (this._timer) resetTimer();
+    //   const phiInterpolator = d3.interpolate(this._rotation[1], props.globe.verticalAxisTilt - destination[1]);
+    //   this._timer = d3.timer((elapsed) => {
+    //     if (!props.spin) {
+    //       resetTimer();
+    //       return;
+    //     }
+    //     rotate(elapsed, phiInterpolator);
+    //   });
+    // }
+
+    const loopCountries = () => {
+      selectedCountry = filteredCountriesRandom[Math.floor(Math.random() * filteredCountriesRandom.length)]
+      destination = selectedCountry.properties.centroid;
+      const projectedCentroid = projection(destination);
+      drawMap(projectedCentroid, selectedCountry);
+      this._rotation = projection.rotate();
+      rotateToPoint()
+
+      sentence.select('.country').text(selectedCountry.properties.name)
+      sentence.select('.percent').text(parseInt((useData.filter(d=>d.countryISO===selectedCountry.properties.isoAlpha2)[0][props.variableName])*10000)/100+'%')
+    }
+    
+    const drawBasic = () => {
+      drawMap();
+    }
+    
     const resetTimer = () => {
-      this._timer.stop();
-      this._timer = null;
+      if (this._timer){
+        this._timer.stop();
+        this._timer = null;
+      }
     };
 
-    if (!props.spin) {
-      if (this._timer) resetTimer();
-      rotateToPoint();
+    if (this._timer) {
+      resetTimer()
+      this._timer = d3.interval(loopCountries, props.rotateChange);
     } else {
-      if (this._timer) resetTimer();
-      const phiInterpolator = d3.interpolate(this._rotation[1], props.globe.verticalAxisTilt - destination[1]);
-      this._timer = d3.timer((elapsed) => {
-        if (!props.spin) {
-          resetTimer();
-          return;
+      loopCountries()
+      this._timer = d3.interval(loopCountries, props.rotateChange);
+    };
+
+    function drag(projection) {
+      let v0, q0, r0, a0, l;
+
+      function pointer(event, that) {
+        const t = d3.pointers(event, that);
+
+        if (t.length !== l) {
+          l = t.length;
+          if (l > 1) a0 = Math.atan2(t[1][1] - t[0][1], t[1][0] - t[0][0]);
+          dragstarted.apply(that, [event, that]);
         }
-        rotate(elapsed, phiInterpolator);
-      });
+
+        // For multitouch, average positions and compute rotation.
+        if (l > 1) {
+          const x = d3.mean(t, p => p[0]);
+          const y = d3.mean(t, p => p[1]);
+          const a = Math.atan2(t[1][1] - t[0][1], t[1][0] - t[0][0]);
+          return [x, y, a];
+        }
+
+        return t[0];
+      }
+
+      function dragstarted(event) {
+        resetTimer()
+        v0 = versor.cartesian(projection.invert(pointer(event, this)));
+        q0 = versor(r0 = projection.rotate());
+      }
+
+      function dragged(event) {
+        const p = pointer(event, this);
+        const v1 = versor.cartesian(projection.rotate(r0).invert(p));
+        const delta = versor.delta(v0, v1);
+        let q1 = versor.multiply(q0, delta);
+
+        // For multitouch, compose with a rotation around the axis.
+        if (p[2]) {
+          const d = (p[2] - a0) / 2;
+          const s = -Math.sin(d);
+          const c = Math.sign(Math.cos(d));
+          q1 = versor.multiply([Math.sqrt(1 - s * s), 0, 0, c * s], q1);
+        }
+
+        projection.rotate(versor.rotation(q1));
+
+        // In vicinity of the antipode (unstable) of q0, restart.
+        if (delta[0] < 0.7) dragstarted.apply(this, [event, this]);
+      }
+
+      return d3.drag()
+          .on("start", dragstarted)
+          .on("drag", dragged);
     }
 
+    canvas
+      .call(drag(projection).on("drag.render", drawBasic))
 
+    
+    //   const phiInterpolator = d3.interpolate(this._rotation[1], props.globe.verticalAxisTilt - destination[1]);
+    //   this._timer = d3.timer((elapsed) => {
+    //     if (!props.spin) {
+    //       resetTimer();
+    //       return;
+    //     }
+    //     rotate(elapsed, phiInterpolator);
+    //   });
 
     return this;
   }
