@@ -6,22 +6,22 @@ Follow the notes below! -->
   import Docs from './App/Docs.svelte';
   import Explorer from './App/Explorer.svelte';
   import VaccineMap from '../js/index';
-  import topo from './topo.json'
-  import chartData from './data.json'
+  import topo from './topo.json';
+  import chartData from './data.json';
 
   let chart = new VaccineMap();
   let chartContainer;
 
   // 🎚️ Create variables for any data or props you want users to be able
   // to update in the demo. (And write buttons to update them below!)
-  let defaultGeo = topo
+  let defaultGeo = topo;
 
   // ...
 
   // 🎈 Tie your custom props back together into one chartProps object.
-  $: chartProps = {         
-      mobile: false,
-      heightRatio: (width, breakpoint) => (width < breakpoint ? 0.5 : 0.4), 
+  $: chartProps = {
+    mobile: false,
+    heightRatio: (width, breakpoint) => (width < breakpoint ? 0.5 : 0.4),
   };
 
   afterUpdate(() => {
@@ -35,8 +35,18 @@ Follow the notes below! -->
       .props(chartProps) // Pass your chartProps
       .draw(); // 🚀 DRAW IT!
   });
-
 </script>
+
+<div id="vaccine-map-container" bind:this={chartContainer} />
+
+<div class="chart-options">
+  <!-- ✏️ Create buttons that update your data/props variables when they're clicked! -->
+</div>
+
+<!-- ⚙️ These components will automatically create interactive documentation for you chart! -->
+<Docs />
+<Explorer title="Data" data={chart.data()} />
+<Explorer title="Props" data={chart.props()} />
 
 <!-- 🖌️ Style your demo page here -->
 <style lang="scss">
@@ -46,22 +56,3 @@ Follow the notes below! -->
     }
   }
 </style>
-
-<div id="vaccine-map-container" bind:this={chartContainer} />
-
-<div class="chart-options">
-  <!-- ✏️ Create buttons that update your data/props variables when they're clicked! -->
-  <button
-    on:click={() => {
-      chartData = getRandomData();
-    }}>New data</button>
-  <button
-    on:click={() => {
-      circleFill = circleFill === 'orange' ? 'steelblue' : 'orange';
-    }}>Change fill</button>
-</div>
-
-<!-- ⚙️ These components will automatically create interactive documentation for you chart! -->
-<Docs />
-<Explorer title='Data' data={chart.data()} />
-<Explorer title='Props' data={chart.props()} />
