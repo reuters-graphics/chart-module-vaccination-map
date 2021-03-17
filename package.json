@@ -1,12 +1,12 @@
 {
-  "name": "@reuters-graphics/chart-module-vaccine-map",
+  "name": "@reuters-graphics/chart-module-vaccinination-map",
   "version": "0.0.1",
   "main": "dist/index.js",
   "module": "src/js/index.js",
   "license": "MIT",
   "private": false,
-  "repository": "github:reuters-graphics/chart-module-vaccine-map",
-  "homepage": "https://reuters-graphics.github.io/chart-module-vaccine-map/",
+  "repository": "github:reuters-graphics/chart-module-vaccination-map",
+  "homepage": "https://reuters-graphics.github.io/chart-module-vaccination-map/",
   "files": [
     "src/js/**/*",
     "src/scss/**/*",
