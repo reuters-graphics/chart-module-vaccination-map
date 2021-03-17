@@ -2,18 +2,18 @@
 
 # VaccineMap
 
-See the [demo page](https://reuters-graphics.github.io/chart-module-vaccine-map/).
+See the [demo page](https://reuters-graphics.github.io/chart-module-vaccination-map/).
 
 ### Install
 
 ```
-$ yarn add https://github.com/reuters-graphics/chart-module-vaccine-map.git
+$ yarn add https://github.com/reuters-graphics/chart-module-vaccination-map.git
 ```
 
 ### Use
 
 ```javascript
-import VaccineMap from '@reuters-graphics/chart-module-vaccine-map';
+import VaccineMap from '@reuters-graphics/chart-module-vaccination-map';
 
 const chart = new VaccineMap();
 
@@ -39,7 +39,7 @@ To apply this chart's default styles when using SCSS, simply define the variable
 ```CSS
 $VaccineMap-container: '#chart';
 
-@import '~@reuters-graphics/chart-module-vaccine-map/src/scss/chart';
+@import '~@reuters-graphics/chart-module-vaccination-map/src/scss/chart';
 ```
 
 ## Developing chart modules
