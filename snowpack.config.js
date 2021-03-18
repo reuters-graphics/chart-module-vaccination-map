@@ -30,7 +30,7 @@ module.exports = {
   },
   buildOptions: {
     out: 'docs',
-    baseUrl: '/chart-module-vaccine-map/',
+    baseUrl: '/chart-module-vaccination-map/',
   },
   optimize: {
     bundle: true,

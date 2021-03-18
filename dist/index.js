@@ -4,8 +4,8 @@ var d3Selection = require('d3-selection');
 var d3Appendselect = require('d3-appendselect');
 var merge = require('lodash/merge');
 var topojson = require('topojson-client');
-require('@reuters-graphics/graphics-atlas-client');
 var d3 = require('d3');
+var d3GeoVoronoi = require('d3-geo-voronoi');
 var Mustache = require('mustache');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
@@ -2108,12 +2108,36 @@ var VaccineMap = /*#__PURE__*/function () {
       var filteredCountriesRandom = filteredCountries.filter(function (d) {
         return d.val > 0.01;
       });
+      var countryCentroids = filteredCountries.filter(function (c) {
+        return c.properties.centroid.length == 2 && c.properties.centroid[0] && c.properties.centroid[1];
+      }).map(function (c) {
+        return {
+          type: 'Feature',
+          properties: c.properties,
+          geometry: {
+            type: 'Point',
+            coordinates: c.properties.centroid
+          },
+          actualFile: c
+        };
+      });
+      var voronoiCentroids = countryCentroids;
       var sentence = this.selection().appendSelect('div.sentence').html(Mustache__default['default'].render(props.sentence, {
         countryName: 'Israel',
         percent: '58%'
       }));
       sentence.selectAll('.country, .percent').style('color', props.globe.colorFill).style('border-bottom', "".concat(props.globe.colorFill, " 1px solid"));
-      var canvas = this.selection().appendSelect('canvas').attr('width', width * 2).attr('height', width * 2).style('width', "".concat(width, "px")).style('height', "".concat(width, "px"));
+      var canvasContainer = this.selection().appendSelect('div.canvas-container').style('width', "".concat(width, "px")).style('height', "".concat(width, "px"));
+      var canvas = canvasContainer.appendSelect('canvas').attr('width', width * 2).attr('height', width * 2).style('width', "".concat(width, "px")).style('height', "".concat(width, "px")); // const svg = canvasContainer
+      //   .appendSelect('svg.veronoi')
+      //   .attr('width', width)
+      //   .attr('height', width)
+      // const countryVoronoiCentroids = svg.appendSelect('g.voronoi')
+      //   .style('fill', 'none')
+      //   .style('pointer-events', 'none')
+      //   .selectAll('path.voronoi')
+      //   .data()
+
       this.selection().appendSelect('div.line').style('background', props.globe.highlight.strokeColor).style('top', "".concat(sentence.node().getBoundingClientRect().height, "px")).style('left', "".concat(width / 2, "px")).style('height', "".concat(width / 2 * 0.735, "px")).style('width', '1px');
       projection.rotate(this._rotation);
       this._context = canvas.node().getContext('2d');
@@ -2125,7 +2149,24 @@ var VaccineMap = /*#__PURE__*/function () {
       var selectedCountry = filteredCountriesRandom[Math.floor(Math.random() * filteredCountriesRandom.length)];
       var destination = [];
       destination = selectedCountry.properties.centroid;
-      d3.geoPath(d3.geoOrthographic().fitExtent([[10, 10], [width - 10, width - 10]], sphere).rotate([-destination[0], props.globe.verticalAxisTilt - destination[1]]), this._context);
+      d3.geoPath(d3.geoOrthographic().fitExtent([[10, 10], [width - 10, width - 10]], sphere).rotate([-destination[0], props.globe.verticalAxisTilt - destination[1]]), this._context); // countryVoronoiCentroids.enter()
+      //   .append('path')
+      //   .attr('class', d => 'voronoi')
+      //   .merge(countryVoronoiCentroids)
+      //   .attr('d', this._pathCheck)
+      //   .on('mouseover', d => {
+      //     // if (props.interaction) {
+      //     //   tipOn(d);
+      //     // }
+      //   })
+      //   .on('mouseout', d => {
+      //     // if (props.interaction) {
+      //     //   tipOff(d);
+      //     // }
+      //   });
+      // countryVoronoiCentroids.exit()
+      //   .remove();
+
       var dC = this._drawCountries;
 
       var drawMap = function drawMap(projectedCentroid, highlighted) {
@@ -2159,24 +2200,6 @@ var VaccineMap = /*#__PURE__*/function () {
           };
         });
       };
-      //   this._timer.stop();
-      //   this._timer = null;
-      // };
-      // if (!props.spin) {
-      //   if (this._timer) resetTimer();
-      //   rotateToPoint();
-      // } else {
-      //   if (this._timer) resetTimer();
-      //   const phiInterpolator = d3.interpolate(this._rotation[1], props.globe.verticalAxisTilt - destination[1]);
-      //   this._timer = d3.timer((elapsed) => {
-      //     if (!props.spin) {
-      //       resetTimer();
-      //       return;
-      //     }
-      //     rotate(elapsed, phiInterpolator);
-      //   });
-      // }
-
 
       var loopCountries = function loopCountries() {
         selectedCountry = filteredCountriesRandom[Math.floor(Math.random() * filteredCountriesRandom.length)];
@@ -2195,22 +2218,14 @@ var VaccineMap = /*#__PURE__*/function () {
         })[0][props.variableName] * 10000) / 100 + '%');
       };
 
+      var voronoiShapefile = d3GeoVoronoi.geoVoronoi().polygons(voronoiCentroids).features;
+
       var onClickSelect = function onClickSelect(event) {
         var clickedPoint = projection.invert(d3.pointer(event));
-        var options = [];
 
-        for (var i = 0; i < filteredCountries.length; i++) {
-          if (_this._pathCheck({
-            type: 'Point',
-            coordinates: filteredCountries[i].properties.centroid
-          })) {
-            options.push(filteredCountries[i]);
-          }
-        }
-
-        for (var _i = 0; _i < options.length; _i++) {
-          if (d3.geoContains(options[_i], clickedPoint)) {
-            selectedCountry = options[_i];
+        for (var i = 0; i < voronoiShapefile.length; i++) {
+          if (d3.geoContains(voronoiShapefile[i], clickedPoint)) {
+            selectedCountry = voronoiShapefile[i].properties.site.actualFile;
             break;
           }
         }
@@ -2293,7 +2308,9 @@ var VaccineMap = /*#__PURE__*/function () {
         return d3.drag().on('start', dragstarted).on('drag', dragged);
       }
 
-      canvas.call(drag(projection).on('drag.render', drawBasic)).on('click', function (event) {
+      canvas.call(drag(projection).on('drag.render', function () {
+        drawBasic(); // onDragSelect();
+      })).on('click', function (event) {
         onClickSelect(event);
       }); //   const phiInterpolator = d3.interpolate(this._rotation[1], props.globe.verticalAxisTilt - destination[1]);
       //   this._timer = d3.timer((elapsed) => {

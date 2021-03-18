@@ -1,7 +1,7 @@
 {
   "inputs": {
     "dist/scss/demo.css": {
-      "bytes": 309655,
+      "bytes": 309894,
       "imports": []
     },
     "dist/demo/App/App.svelte.css": {
@@ -89,7 +89,7 @@
       "bytes": 330,
       "imports": []
     },
-    "_snowpack/pkg/common/_commonjsHelpers-eb5a497e.js": {
+    "_snowpack/pkg/common/_commonjsHelpers-6d0ad781.js": {
       "bytes": 666,
       "imports": []
     },
@@ -101,7 +101,7 @@
           "kind": "import-statement"
         },
         {
-          "path": "_snowpack/pkg/common/_commonjsHelpers-eb5a497e.js",
+          "path": "_snowpack/pkg/common/_commonjsHelpers-6d0ad781.js",
           "kind": "import-statement"
         }
       ]
@@ -110,7 +110,7 @@
       "bytes": 761046,
       "imports": [
         {
-          "path": "_snowpack/pkg/common/_commonjsHelpers-eb5a497e.js",
+          "path": "_snowpack/pkg/common/_commonjsHelpers-6d0ad781.js",
           "kind": "import-statement"
         }
       ]
@@ -119,7 +119,7 @@
       "bytes": 117819,
       "imports": [
         {
-          "path": "_snowpack/pkg/common/_commonjsHelpers-eb5a497e.js",
+          "path": "_snowpack/pkg/common/_commonjsHelpers-6d0ad781.js",
           "kind": "import-statement"
         }
       ]
@@ -208,24 +208,11 @@
       "bytes": 2961,
       "imports": []
     },
-    "_snowpack/pkg/common/identity-ddb51b3b.js": {
-      "bytes": 34990,
-      "imports": [
-        {
-          "path": "_snowpack/pkg/common/_commonjsHelpers-eb5a497e.js",
-          "kind": "import-statement"
-        }
-      ]
-    },
     "_snowpack/pkg/lodash/merge.js": {
-      "bytes": 24340,
+      "bytes": 58485,
       "imports": [
         {
-          "path": "_snowpack/pkg/common/identity-ddb51b3b.js",
-          "kind": "import-statement"
-        },
-        {
-          "path": "_snowpack/pkg/common/_commonjsHelpers-eb5a497e.js",
+          "path": "_snowpack/pkg/common/_commonjsHelpers-6d0ad781.js",
           "kind": "import-statement"
         }
       ]
@@ -234,28 +221,36 @@
       "bytes": 14145,
       "imports": []
     },
-    "_snowpack/pkg/@reuters-graphics/graphics-atlas-client.js": {
-      "bytes": 281733,
+    "_snowpack/pkg/common/delaunay-6cb1bb76.js": {
+      "bytes": 37560,
+      "imports": []
+    },
+    "_snowpack/pkg/d3.js": {
+      "bytes": 441068,
       "imports": [
         {
-          "path": "_snowpack/pkg/common/_commonjsHelpers-eb5a497e.js",
+          "path": "_snowpack/pkg/common/active-108e08c0.js",
           "kind": "import-statement"
         },
         {
-          "path": "_snowpack/pkg/common/identity-ddb51b3b.js",
+          "path": "_snowpack/pkg/common/active-108e08c0.js",
+          "kind": "import-statement"
+        },
+        {
+          "path": "_snowpack/pkg/common/delaunay-6cb1bb76.js",
+          "kind": "import-statement"
+        },
+        {
+          "path": "_snowpack/pkg/common/delaunay-6cb1bb76.js",
           "kind": "import-statement"
         }
       ]
     },
-    "_snowpack/pkg/d3.js": {
-      "bytes": 478511,
+    "_snowpack/pkg/d3-geo-voronoi.js": {
+      "bytes": 89369,
       "imports": [
         {
-          "path": "_snowpack/pkg/common/active-108e08c0.js",
-          "kind": "import-statement"
-        },
-        {
-          "path": "_snowpack/pkg/common/active-108e08c0.js",
+          "path": "_snowpack/pkg/common/delaunay-6cb1bb76.js",
           "kind": "import-statement"
         }
       ]
@@ -268,13 +263,13 @@
       "bytes": 25183,
       "imports": [
         {
-          "path": "_snowpack/pkg/common/_commonjsHelpers-eb5a497e.js",
+          "path": "_snowpack/pkg/common/_commonjsHelpers-6d0ad781.js",
           "kind": "import-statement"
         }
       ]
     },
     "dist/js/index.js": {
-      "bytes": 14799,
+      "bytes": 15502,
       "imports": [
         {
           "path": "_snowpack/pkg/d3-transition.js",
@@ -293,11 +288,11 @@
           "kind": "import-statement"
         },
         {
-          "path": "_snowpack/pkg/@reuters-graphics/graphics-atlas-client.js",
+          "path": "_snowpack/pkg/d3.js",
           "kind": "import-statement"
         },
         {
-          "path": "_snowpack/pkg/d3.js",
+          "path": "_snowpack/pkg/d3-geo-voronoi.js",
           "kind": "import-statement"
         },
         {
@@ -392,10 +387,10 @@
       "entryPoint": "dist/scss/demo.css",
       "inputs": {
         "dist/scss/demo.css": {
-          "bytesInOutput": 251539
+          "bytesInOutput": 251745
         }
       },
-      "bytes": 251557
+      "bytes": 251763
     },
     "../~~bundle~~/dist/demo/App/index.js": {
       "imports": [],
@@ -437,7 +432,7 @@
         "dist/demo/App/Docs.svelte.css": {
           "bytesInOutput": 0
         },
-        "_snowpack/pkg/common/_commonjsHelpers-eb5a497e.js": {
+        "_snowpack/pkg/common/_commonjsHelpers-6d0ad781.js": {
           "bytesInOutput": 381
         },
         "_snowpack/pkg/svelte-highlight.js": {
@@ -473,20 +468,20 @@
         "_snowpack/pkg/d3-appendselect.js": {
           "bytesInOutput": 919
         },
-        "_snowpack/pkg/common/identity-ddb51b3b.js": {
-          "bytesInOutput": 7538
-        },
         "_snowpack/pkg/lodash/merge.js": {
-          "bytesInOutput": 4306
+          "bytesInOutput": 11840
         },
         "_snowpack/pkg/topojson-client.js": {
           "bytesInOutput": 3218
         },
-        "_snowpack/pkg/@reuters-graphics/graphics-atlas-client.js": {
-          "bytesInOutput": 17355
-        },
         "_snowpack/pkg/d3.js": {
-          "bytesInOutput": 109354
+          "bytesInOutput": 109064
+        },
+        "_snowpack/pkg/common/delaunay-6cb1bb76.js": {
+          "bytesInOutput": 16344
+        },
+        "_snowpack/pkg/d3-geo-voronoi.js": {
+          "bytesInOutput": 42606
         },
         "_snowpack/pkg/versor/src/index.js": {
           "bytesInOutput": 1858
@@ -495,7 +490,7 @@
           "bytesInOutput": 6609
         },
         "dist/js/index.js": {
-          "bytesInOutput": 6297
+          "bytesInOutput": 6561
         },
         "dist/demo/topo.json.proxy.js": {
           "bytesInOutput": 619319
@@ -513,7 +508,7 @@
           "bytesInOutput": 44
         }
       },
-      "bytes": 1960064
+      "bytes": 2001629
     },
     "../~~bundle~~/dist/demo/App/index.css": {
       "imports": [],

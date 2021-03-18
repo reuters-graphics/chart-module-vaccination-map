@@ -219,7 +219,12 @@ class VaccineMap {
     );
 
     const countryCentroids = filteredCountries
-      .filter(c => c.properties.centroid.length == 2 && c.properties.centroid[0] && c.properties.centroid[1])
+      .filter(
+        (c) =>
+          c.properties.centroid.length == 2 &&
+          c.properties.centroid[0] &&
+          c.properties.centroid[1]
+      )
       .map((c) => ({
         type: 'Feature',
         properties: c.properties,
@@ -291,7 +296,7 @@ class VaccineMap {
 
     let destination = [];
     destination = selectedCountry.properties.centroid;
-    
+
     const geoPath = d3.geoPath(
       d3
         .geoOrthographic()
@@ -362,42 +367,6 @@ class VaccineMap {
         });
     };
 
-    let lastElapsed = 0;
-    const rotate = (elapsed, phiInterpolator) => {
-      const scale = d3
-        .scaleLinear()
-        .domain([0, props.spinSpeed])
-        .range([0, 360]);
-      const step = scale(elapsed - lastElapsed);
-
-      const phi = phiInterpolator(Math.min(elapsed / props.spinToSpeed, 1));
-      projection.rotate([this._rotation[0] + step, phi]);
-      const projectedCentroid = projection(destination);
-      drawMap(projectedCentroid, selectedCountry);
-      this._rotation = projection.rotate();
-      lastElapsed = elapsed;
-    };
-
-    // const resetTimer = () => {
-    //   this._timer.stop();
-    //   this._timer = null;
-    // };
-
-    // if (!props.spin) {
-    //   if (this._timer) resetTimer();
-    //   rotateToPoint();
-    // } else {
-    //   if (this._timer) resetTimer();
-    //   const phiInterpolator = d3.interpolate(this._rotation[1], props.globe.verticalAxisTilt - destination[1]);
-    //   this._timer = d3.timer((elapsed) => {
-    //     if (!props.spin) {
-    //       resetTimer();
-    //       return;
-    //     }
-    //     rotate(elapsed, phiInterpolator);
-    //   });
-    // }
-
     const loopCountries = () => {
       selectedCountry =
         filteredCountriesRandom[
@@ -412,7 +381,6 @@ class VaccineMap {
       drawMap(projectedCentroid, selectedCountry);
       this._rotation = projection.rotate();
       rotateToPoint();
-
       sentence.select('.country').text(selectedCountry.properties.name);
       sentence
         .select('.percent')
@@ -426,22 +394,28 @@ class VaccineMap {
             '%'
         );
     };
-    const voronoiShapefile = geoVoronoi().polygons(voronoiCentroids).features
+    const voronoiShapefile = geoVoronoi().polygons(voronoiCentroids).features;
 
     const onClickSelect = (event) => {
       const clickedPoint = projection.invert(d3.pointer(event));
-      // const options = [];
 
-      // for (let i = 0; i < filteredCountries.length; i++) {
-      //   if (
-      //     this._pathCheck({
-      //       type: 'Point',
-      //       coordinates: filteredCountries[i].properties.centroid,
-      //     })
-      //   ) {
-      //     options.push(filteredCountries[i]);
-      //   }
-      // }
+      let chosenObj;
+      for (let i = 0; i < voronoiShapefile.length; i++) {
+        if (d3.geoContains(voronoiShapefile[i], clickedPoint)) {
+          selectedCountry = voronoiShapefile[i].properties.site.actualFile;
+          break;
+        }
+      }
+      d3.selectAll('.line, .sentence').classed('hide', false);
+
+      chosenCountry(chosenObj);
+    };
+
+    const onDragSelect = () => {
+      let p = projection.rotate();
+      console.log(p);
+      const clickedPoint = [p[0], p[1]];
+
       let chosenObj;
       for (let i = 0; i < voronoiShapefile.length; i++) {
         if (d3.geoContains(voronoiShapefile[i], clickedPoint)) {
@@ -527,7 +501,12 @@ class VaccineMap {
     }
 
     canvas
-      .call(drag(projection).on('drag.render', drawBasic))
+      .call(
+        drag(projection).on('drag.render', function () {
+          drawBasic();
+          // onDragSelect();
+        })
+      )
       .on('click', (event) => {
         onClickSelect(event);
       });
