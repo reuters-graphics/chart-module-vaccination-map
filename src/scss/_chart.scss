@@ -4,6 +4,16 @@
 $VaccineMap-container: '#vaccine-map-container' !default;
 
 #{$VaccineMap-container} {
+  .canvas-container{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    canvas, svg{
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+  }
   position: relative;
   canvas:active {
     cursor: -webkit-grabbing;

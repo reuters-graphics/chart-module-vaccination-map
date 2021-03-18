@@ -3,8 +3,8 @@ import 'd3-transition';
 import { appendSelect } from 'd3-appendselect';
 import merge from 'lodash/merge';
 import * as topojson from 'topojson-client';
-import AtlasMetadataClient from '@reuters-graphics/graphics-atlas-client';
 import * as d3 from 'd3';
+import { geoVoronoi } from 'd3-geo-voronoi';
 import versor from 'versor/src/index.js';
 import Mustache from 'mustache';
 // import * as inertia from 'd3-inertia'
@@ -213,9 +213,24 @@ class VaccineMap {
         )
       );
     });
+
     const filteredCountriesRandom = filteredCountries.filter(
       (d) => d.val > 0.01
     );
+
+    const countryCentroids = filteredCountries
+      .filter(c => c.properties.centroid.length == 2 && c.properties.centroid[0] && c.properties.centroid[1])
+      .map((c) => ({
+        type: 'Feature',
+        properties: c.properties,
+        geometry: {
+          type: 'Point',
+          coordinates: c.properties.centroid,
+        },
+        actualFile: c,
+      }));
+
+    const voronoiCentroids = countryCentroids;
 
     const sentence = this.selection()
       .appendSelect('div.sentence')
@@ -231,12 +246,28 @@ class VaccineMap {
       .style('color', props.globe.colorFill)
       .style('border-bottom', `${props.globe.colorFill} 1px solid`);
 
-    const canvas = this.selection()
+    const canvasContainer = this.selection()
+      .appendSelect('div.canvas-container')
+      .style('width', `${width}px`)
+      .style('height', `${width}px`);
+
+    const canvas = canvasContainer
       .appendSelect('canvas')
       .attr('width', width * 2)
       .attr('height', width * 2)
       .style('width', `${width}px`)
       .style('height', `${width}px`);
+
+    // const svg = canvasContainer
+    //   .appendSelect('svg.veronoi')
+    //   .attr('width', width)
+    //   .attr('height', width)
+
+    // const countryVoronoiCentroids = svg.appendSelect('g.voronoi')
+    //   .style('fill', 'none')
+    //   .style('pointer-events', 'none')
+    //   .selectAll('path.voronoi')
+    //   .data()
 
     this.selection()
       .appendSelect('div.line')
@@ -260,6 +291,7 @@ class VaccineMap {
 
     let destination = [];
     destination = selectedCountry.properties.centroid;
+    
     const geoPath = d3.geoPath(
       d3
         .geoOrthographic()
@@ -276,6 +308,26 @@ class VaccineMap {
         ]),
       this._context
     );
+
+    // countryVoronoiCentroids.enter()
+    //   .append('path')
+    //   .attr('class', d => 'voronoi')
+    //   .merge(countryVoronoiCentroids)
+    //   .attr('d', this._pathCheck)
+    //   .on('mouseover', d => {
+    //     // if (props.interaction) {
+    //     //   tipOn(d);
+    //     // }
+    //   })
+    //   .on('mouseout', d => {
+    //     // if (props.interaction) {
+    //     //   tipOff(d);
+    //     // }
+    //   });
+
+    // countryVoronoiCentroids.exit()
+    //   .remove();
+
     const dC = this._drawCountries;
     const drawMap = (projectedCentroid, highlighted) => {
       this._context.clearRect(0, 0, width, width);
@@ -374,25 +426,26 @@ class VaccineMap {
             '%'
         );
     };
+    const voronoiShapefile = geoVoronoi().polygons(voronoiCentroids).features
 
     const onClickSelect = (event) => {
-      let clickedPoint = projection.invert(d3.pointer(event));
-      let options = [];
+      const clickedPoint = projection.invert(d3.pointer(event));
+      // const options = [];
 
-      for (let i = 0; i < filteredCountries.length; i++) {
-        if (
-          this._pathCheck({
-            type: 'Point',
-            coordinates: filteredCountries[i].properties.centroid,
-          })
-        ) {
-          options.push(filteredCountries[i]);
-        }
-      }
+      // for (let i = 0; i < filteredCountries.length; i++) {
+      //   if (
+      //     this._pathCheck({
+      //       type: 'Point',
+      //       coordinates: filteredCountries[i].properties.centroid,
+      //     })
+      //   ) {
+      //     options.push(filteredCountries[i]);
+      //   }
+      // }
       let chosenObj;
-      for (let i = 0; i < options.length; i++) {
-        if (d3.geoContains(options[i], clickedPoint)) {
-          selectedCountry = options[i];
+      for (let i = 0; i < voronoiShapefile.length; i++) {
+        if (d3.geoContains(voronoiShapefile[i], clickedPoint)) {
+          selectedCountry = voronoiShapefile[i].properties.site.actualFile;
           break;
         }
       }
