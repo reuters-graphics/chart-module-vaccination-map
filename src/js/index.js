@@ -66,8 +66,9 @@ class VaccineMap {
     locale: 'en',
     getDataRange: (width) => ({ min: 0, max: 1 }),
     borders: {
-      strokeColor: '#2f353f',
+      strokeColor: '#fff',
       strokeWidth: 0.5,
+      strokeOpacity: 0.15,
       disputedBorders: {
         show: false,
         strokeColor: '#2f353f',
@@ -80,8 +81,14 @@ class VaccineMap {
       strokeWidth: 0.1,
       landFill: 'rgba(153,153,153,0.2)',
       verticalAxisTilt: 15,
-      colorFill: '#22BD3B',
-      fillScale: d3.scaleLinear().domain([0, 1]).range([0.07, 1]),
+      colorFill: '#A3BE8C',
+      colorBins: d3.scaleLinear()
+        .interpolate(d3.interpolateHcl)
+        .domain([0, 0.25, 0.5, 0.75, 1])
+        .range([
+          d3.rgb('#505753'), d3.rgb('#6B7165'), d3.rgb('#838B78'), d3.rgb('#9BA987'), d3.rgb('#ACBD93') 
+        ]),
+      fillScale: d3.scaleLinear().domain([0, 1]).range([0.1, 1.05]),
       highlight: {
         strokeColor: 'white',
         strokeWidth: 1.5,
@@ -116,15 +123,21 @@ class VaccineMap {
   }
 
   _drawLand() {
-    const { globe } = this.props();
-    this._context.beginPath();
-    this._path(this._land);
-    this._context.fillStyle = globe.landFill;
-    this._context.fill();
+    // const { globe } = this.props();
+    // this._context.beginPath();
+    // this._path(this._land);
+    // this._context.fillStyle = globe.landFill;
+    // this._context.fill();
   }
 
   _drawBorders() {
     const { borders } = this.props();
+    this._context.beginPath();
+    this._path(this._countryBorders);
+    this._context.strokeStyle = borders.strokeColor;
+    this._context.globalAlpha = borders.strokeOpacity;
+    this._context.lineWidth = borders.strokeWidth;
+    this._context.stroke();
     if (borders.disputedBorders.show) this._drawDisputedBorders();
   }
 
@@ -142,12 +155,10 @@ class VaccineMap {
 
   _drawCountries(country, all, highlight) {
     const { globe } = all.props();
-
     all._context.beginPath();
+    all._context.globalAlpha = 1;
     all._path(country);
-    all._context.fillStyle = globe.colorFill;
-    all._context.globalAlpha = globe.fillScale(country.val);
-
+    all._context.fillStyle = globe.colorBins(country.val);
     all._context.fill();
 
     if (highlight) {
@@ -171,6 +182,7 @@ class VaccineMap {
     const props = this.props();
     const topology = this.geo();
     if (!topology) return this;
+
 
     const countriesFeatures = props.topology.getCountryFeatures(topology);
     const disputedBoundariesFeatures = props.topology.getDisputedBorderFeatures(
@@ -196,6 +208,7 @@ class VaccineMap {
     useData = useData.filter((d) => d[props.variableName] > 0);
     const filteredCountryKeys = useData.map((d) => d.countryISO);
     this._disputedBorders = topojson.mesh(topology, disputedBoundariesFeatures);
+    this._countryBorders = topojson.mesh(topology, countriesFeatures);
     this._land = topojson.feature(topology, landFeatures);
     const countries = topojson.feature(topology, countriesFeatures);
     const filteredCountries = countries.features.filter((d) =>
@@ -214,6 +227,7 @@ class VaccineMap {
           ]
         )
       );
+      console.log(d.val);
     });
 
     const filteredCountriesRandom = filteredCountries.filter(
@@ -342,7 +356,7 @@ class VaccineMap {
     const drawMap = (projectedCentroid, highlighted) => {
       this._context.clearRect(0, 0, width, width);
       this._drawLand();
-      this._drawBorders();
+      
       const all = this;
       filteredCountries.forEach(function (d) {
         if (d === highlighted) {
@@ -353,6 +367,7 @@ class VaccineMap {
       });
 
       this._context.globalAlpha = 1;
+      this._drawBorders();
       this._drawSphere();
 
       const p = projection(highlighted.properties.centroid);
