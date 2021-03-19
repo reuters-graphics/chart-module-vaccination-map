@@ -146,8 +146,8 @@ class VaccineMap {
     all._context.beginPath();
     all._path(country);
     all._context.fillStyle = globe.colorFill;
-    all._context.globalAlpha = globe.fillScale(country.val);  
-    
+    all._context.globalAlpha = globe.fillScale(country.val);
+
     all._context.fill();
 
     if (highlight) {
@@ -276,7 +276,7 @@ class VaccineMap {
     //   .selectAll('path.voronoi')
     //   .data()
 
-    canvasContainer
+    const line = canvasContainer
       .appendSelect('svg')
       .attr('height', width)
       .attr('width', width)
@@ -285,7 +285,7 @@ class VaccineMap {
       .attr('x1', `${width / 2}`)
       .attr('x2', `${width / 2}`)
       .attr('y1', `0`)
-      .attr('y2', `${(width / 2) * 0.735}`)
+      .attr('y2', `${(width / 2) * 0.735}`);
 
     projection.rotate(this._rotation);
 
@@ -354,6 +354,23 @@ class VaccineMap {
 
       this._context.globalAlpha = 1;
       this._drawSphere();
+
+      const p = projection(highlighted.properties.centroid);
+
+      line.attr('x2', `${p[0]}`).attr('y2', `${p[1]}`);
+
+      sentence.select('.country').text(highlighted.properties.name);
+      sentence
+        .select('.percent')
+        .text(
+          parseInt(
+            useData.filter(
+              (d) => d.countryISO === highlighted.properties.isoAlpha2
+            )[0][props.variableName] * 10000
+          ) /
+            100 +
+            '%'
+        );
     };
 
     const rotateToPoint = () => {
@@ -361,6 +378,7 @@ class VaccineMap {
         -destination[0],
         props.globe.verticalAxisTilt - destination[1],
       ]);
+
       canvas
         .transition()
         .duration(props.spinToSpeed)
@@ -386,55 +404,35 @@ class VaccineMap {
       drawMap(projectedCentroid, selectedCountry);
       this._rotation = projection.rotate();
       rotateToPoint();
-      sentence.select('.country').text(selectedCountry.properties.name);
-      sentence
-        .select('.percent')
-        .text(
-          parseInt(
-            useData.filter(
-              (d) => d.countryISO === selectedCountry.properties.isoAlpha2
-            )[0][props.variableName] * 10000
-          ) /
-            100 +
-            '%'
-        );
     };
     const voronoiShapefile = geoVoronoi().polygons(voronoiCentroids).features;
 
     const onClickSelect = (event) => {
       const clickedPoint = projection.invert(d3.pointer(event));
 
-      let chosenObj;
       for (let i = 0; i < voronoiShapefile.length; i++) {
         if (d3.geoContains(voronoiShapefile[i], clickedPoint)) {
           selectedCountry = voronoiShapefile[i].properties.site.actualFile;
           break;
         }
       }
-      d3.selectAll('.line, .sentence').classed('hide', false);
 
-      chosenCountry(chosenObj);
+      chosenCountry(selectedCountry);
     };
 
     const onDragSelect = () => {
-      let p = projection.rotate();
-      console.log(p);
-      const clickedPoint = [p[0], p[1]];
+      const clickedPoint = projection.invert([width / 2, width / 2]);
 
       let chosenObj;
       for (let i = 0; i < voronoiShapefile.length; i++) {
         if (d3.geoContains(voronoiShapefile[i], clickedPoint)) {
-          selectedCountry = voronoiShapefile[i].properties.site.actualFile;
+          // selectedCountry = voronoiShapefile[i].properties.site.actualFile;
+          chosenObj = voronoiShapefile[i].properties.site.actualFile;
           break;
         }
       }
-      d3.selectAll('.line, .sentence').classed('hide', false);
 
-      chosenCountry(chosenObj);
-    };
-
-    const drawBasic = () => {
-      drawMap();
+      drawMap(false, chosenObj);
     };
 
     const resetTimer = () => {
@@ -482,7 +480,6 @@ class VaccineMap {
       }
 
       function dragged(event) {
-        d3.selectAll('.line, .sentence').classed('hide', true);
         const p = pointer(event, this);
         const v1 = versor.cartesian(projection.rotate(r0).invert(p));
         const delta = versor.delta(v0, v1);
@@ -508,8 +505,7 @@ class VaccineMap {
     canvas
       .call(
         drag(projection).on('drag.render', function () {
-          drawBasic();
-          // onDragSelect();
+          onDragSelect();
         })
       )
       .on('click', (event) => {

@@ -1900,9 +1900,10 @@ var VaccineMap = /*#__PURE__*/function () {
       globe: {
         strokeColor: 'rgba(255, 255, 255, 0.5)',
         strokeWidth: 0.1,
-        landFill: 'rgba(153,153,153,0.25)',
+        landFill: 'rgba(153,153,153,0.2)',
         verticalAxisTilt: 15,
         colorFill: '#22BD3B',
+        fillScale: d3.scaleLinear().domain([0, 1]).range([0.07, 1]),
         highlight: {
           strokeColor: 'white',
           strokeWidth: 1.5,
@@ -2038,7 +2039,7 @@ var VaccineMap = /*#__PURE__*/function () {
       all._path(country);
 
       all._context.fillStyle = globe.colorFill;
-      all._context.globalAlpha = country.val;
+      all._context.globalAlpha = globe.fillScale(country.val);
 
       all._context.fill();
 
@@ -2138,7 +2139,7 @@ var VaccineMap = /*#__PURE__*/function () {
       //   .selectAll('path.voronoi')
       //   .data()
 
-      this.selection().appendSelect('div.line').style('background', props.globe.highlight.strokeColor).style('top', "".concat(sentence.node().getBoundingClientRect().height, "px")).style('left', "".concat(width / 2, "px")).style('height', "".concat(width / 2 * 0.735, "px")).style('width', '1px');
+      var line = canvasContainer.appendSelect('svg').attr('height', width).attr('width', width).appendSelect('line.line').style('stroke', props.globe.highlight.strokeColor).attr('x1', "".concat(width / 2)).attr('x2', "".concat(width / 2)).attr('y1', "0").attr('y2', "".concat(width / 2 * 0.735));
       projection.rotate(this._rotation);
       this._context = canvas.node().getContext('2d');
 
@@ -2187,6 +2188,13 @@ var VaccineMap = /*#__PURE__*/function () {
         _this._context.globalAlpha = 1;
 
         _this._drawSphere();
+
+        var p = projection(highlighted.properties.centroid);
+        line.attr('x2', "".concat(p[0])).attr('y2', "".concat(p[1]));
+        sentence.select('.country').text(highlighted.properties.name);
+        sentence.select('.percent').text(parseInt(useData.filter(function (d) {
+          return d.countryISO === highlighted.properties.isoAlpha2;
+        })[0][props.variableName] * 10000) / 100 + '%');
       };
 
       var rotateToPoint = function rotateToPoint() {
@@ -2212,10 +2220,6 @@ var VaccineMap = /*#__PURE__*/function () {
         drawMap(projectedCentroid, selectedCountry);
         _this._rotation = projection.rotate();
         rotateToPoint();
-        sentence.select('.country').text(selectedCountry.properties.name);
-        sentence.select('.percent').text(parseInt(useData.filter(function (d) {
-          return d.countryISO === selectedCountry.properties.isoAlpha2;
-        })[0][props.variableName] * 10000) / 100 + '%');
       };
 
       var voronoiShapefile = d3GeoVoronoi.geoVoronoi().polygons(voronoiCentroids).features;
@@ -2230,12 +2234,22 @@ var VaccineMap = /*#__PURE__*/function () {
           }
         }
 
-        d3.selectAll('.line, .sentence').classed('hide', false);
         chosenCountry();
       };
 
-      var drawBasic = function drawBasic() {
-        drawMap();
+      var onDragSelect = function onDragSelect() {
+        var clickedPoint = projection.invert([width / 2, width / 2]);
+        var chosenObj;
+
+        for (var i = 0; i < voronoiShapefile.length; i++) {
+          if (d3.geoContains(voronoiShapefile[i], clickedPoint)) {
+            // selectedCountry = voronoiShapefile[i].properties.site.actualFile;
+            chosenObj = voronoiShapefile[i].properties.site.actualFile;
+            break;
+          }
+        }
+
+        drawMap(false, chosenObj);
       };
 
       var resetTimer = function resetTimer() {
@@ -2287,7 +2301,6 @@ var VaccineMap = /*#__PURE__*/function () {
         }
 
         function dragged(event) {
-          d3.selectAll('.line, .sentence').classed('hide', true);
           var p = pointer(event, this);
           var v1 = versor.cartesian(projection.rotate(r0).invert(p));
           var delta = versor.delta(v0, v1);
@@ -2309,7 +2322,7 @@ var VaccineMap = /*#__PURE__*/function () {
       }
 
       canvas.call(drag(projection).on('drag.render', function () {
-        drawBasic(); // onDragSelect();
+        onDragSelect();
       })).on('click', function (event) {
         onClickSelect(event);
       }); //   const phiInterpolator = d3.interpolate(this._rotation[1], props.globe.verticalAxisTilt - destination[1]);
