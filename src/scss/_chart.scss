@@ -14,6 +14,9 @@ $VaccineMap-container: '#vaccine-map-container' !default;
       left: 0;
       top: 0;
     }
+    svg{
+      pointer-events: none;
+    }
   }
   position: relative;
   canvas:active {

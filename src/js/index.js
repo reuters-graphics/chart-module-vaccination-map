@@ -78,9 +78,12 @@ class VaccineMap {
     globe: {
       strokeColor: 'rgba(255, 255, 255, 0.5)',
       strokeWidth: 0.1,
-      landFill: 'rgba(153,153,153,0.25)',
+      landFill: 'rgba(153,153,153,0.1)',
       verticalAxisTilt: 15,
       colorFill: '#22BD3B',
+      lowValueColor: 'rgba(153,153,153,0.2)',
+      lowValueBreakpoint: 0.01,
+      fillScale: d3.scaleLinear().domain([0, 1]).range([0.04, 1]),
       highlight: {
         strokeColor: 'white',
         strokeWidth: 1.5,
@@ -144,8 +147,14 @@ class VaccineMap {
 
     all._context.beginPath();
     all._path(country);
-    all._context.fillStyle = globe.colorFill;
-    all._context.globalAlpha = country.val;
+    if (country.val < globe.lowValueBreakpoint){
+      all._context.fillStyle = globe.lowValueColor;
+      all._context.globalAlpha = 1;
+    } else {
+      all._context.fillStyle = globe.colorFill;
+      all._context.globalAlpha = globe.fillScale(country.val);  
+    }
+    
     all._context.fill();
 
     if (highlight) {
@@ -274,13 +283,16 @@ class VaccineMap {
     //   .selectAll('path.voronoi')
     //   .data()
 
-    this.selection()
-      .appendSelect('div.line')
-      .style('background', props.globe.highlight.strokeColor)
-      .style('top', `${sentence.node().getBoundingClientRect().height}px`)
-      .style('left', `${width / 2}px`)
-      .style('height', `${(width / 2) * 0.735}px`)
-      .style('width', '1px');
+    canvasContainer
+      .appendSelect('svg')
+      .attr('height', width)
+      .attr('width', width)
+      .appendSelect('line.line')
+      .style('stroke', props.globe.highlight.strokeColor)
+      .attr('x1', `${width / 2}`)
+      .attr('x2', `${width / 2}`)
+      .attr('y1', `0`)
+      .attr('y2', `${(width / 2) * 0.735}`)
 
     projection.rotate(this._rotation);
 
