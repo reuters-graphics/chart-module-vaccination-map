@@ -78,12 +78,10 @@ class VaccineMap {
     globe: {
       strokeColor: 'rgba(255, 255, 255, 0.5)',
       strokeWidth: 0.1,
-      landFill: 'rgba(153,153,153,0.1)',
+      landFill: 'rgba(153,153,153,0.2)',
       verticalAxisTilt: 15,
       colorFill: '#22BD3B',
-      lowValueColor: 'rgba(153,153,153,0.2)',
-      lowValueBreakpoint: 0.01,
-      fillScale: d3.scaleLinear().domain([0, 1]).range([0.04, 1]),
+      fillScale: d3.scaleLinear().domain([0, 1]).range([0.07, 1]),
       highlight: {
         strokeColor: 'white',
         strokeWidth: 1.5,
@@ -147,13 +145,8 @@ class VaccineMap {
 
     all._context.beginPath();
     all._path(country);
-    if (country.val < globe.lowValueBreakpoint){
-      all._context.fillStyle = globe.lowValueColor;
-      all._context.globalAlpha = 1;
-    } else {
-      all._context.fillStyle = globe.colorFill;
-      all._context.globalAlpha = globe.fillScale(country.val);  
-    }
+    all._context.fillStyle = globe.colorFill;
+    all._context.globalAlpha = globe.fillScale(country.val);  
     
     all._context.fill();
 
