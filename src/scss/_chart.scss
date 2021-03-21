@@ -54,12 +54,25 @@ $VaccineMap-container: '#vaccine-map-container' !default;
       display: none;
     }
   }
+  .sentence-container{
+    position: absolute;
+    top: 12%;
+    width: 100%;
+    &.mobile{
+      position: relative;
+      top: 0%;
+    }
+  }
+
   .sentence {
     font-size: 1.3rem;
     line-height: 1.8rem;
     color: white;
     font-weight: 100;
     text-align: center;
+    max-width: 300px;
+    margin: 0 auto;
+
     .text{
       font-size: 1rem;
       line-height: 1.6rem;
@@ -74,6 +87,7 @@ $VaccineMap-container: '#vaccine-map-container' !default;
       display: none;
     }
   }
+
 
   .line {
     position: absolute;

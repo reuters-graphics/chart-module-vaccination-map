@@ -60,7 +60,6 @@ class VaccineMap {
    * functions that can get properties from your data.
    */
   defaultProps = {
-    heightRatio: (width, breakpoint) => (width < breakpoint ? 0.8 : 0.5),
     locale: 'en',
     getDataRange: (width) => ({ min: 0, max: 1 }),
     borders: {
@@ -77,7 +76,7 @@ class VaccineMap {
       strokeColor: 'rgba(255, 255, 255, 0.5)',
       strokeWidth: 0.1,
       landFill: 'rgba(153,153,153,0.2)',
-      verticalAxisTilt: 15,
+      verticalAxisTilt: 8,
       colorFill: '#22BD3B',
       fillScale: d3.scaleLinear().domain([0, 1]).range([0.05, 1]),
       highlight: {
@@ -92,6 +91,7 @@ class VaccineMap {
     spinSpeed: 12000,
     spinToSpeed: 750,
     rotateChange: 3500,
+    breakpoint: 600,
     sentence:
       "<div class='country'> {{ countryName }}</div> <div class='text'><span class='percent'>{{oneDose}}</span> received at least one dose.</div> <div class='text fully-text'><span class='fully'>{{fully}}</span> have been fully vaccinated.</div>",
     topology: {
@@ -247,6 +247,8 @@ class VaccineMap {
     const voronoiCentroids = countryCentroids;
 
     const sentence = this.selection()
+      .appendSelect('div.sentence-container')
+      .classed('mobile', width < props.breakpoint)
       .appendSelect('div.sentence')
       .html(
         Mustache.render(props.sentence, {
@@ -278,7 +280,7 @@ class VaccineMap {
     //   .style('pointer-events', 'none')
     //   .selectAll('path.voronoi')
     //   .data()
-
+    console.log(sentence.node().getBoundingClientRect())
     const line = canvasContainer
       .appendSelect('svg')
       .attr('height', width)
@@ -287,7 +289,7 @@ class VaccineMap {
       .style('stroke', props.globe.highlight.strokeColor)
       .attr('x1', `${width / 2}`)
       .attr('x2', `${width / 2}`)
-      .attr('y1', `0`)
+      .attr('y1', width>props.breakpoint?(sentence.node().getBoundingClientRect().y + 10):0)
       .attr('y2', `${(width / 2) * 0.735}`);
 
     projection.rotate(this._rotation);
