@@ -7,8 +7,6 @@ import * as d3 from 'd3';
 import { geoVoronoi } from 'd3-geo-voronoi';
 import versor from 'versor/src/index.js';
 import Mustache from 'mustache';
-// import * as inertia from 'd3-inertia'
-// import { geoVoronoi } from 'd3-geo-voronoi';
 
 d3.selection.prototype.appendSelect = appendSelect;
 
@@ -81,21 +79,21 @@ class VaccineMap {
       landFill: 'rgba(153,153,153,0.2)',
       verticalAxisTilt: 15,
       colorFill: '#22BD3B',
-      fillScale: d3.scaleLinear().domain([0, 1]).range([0.07, 1]),
+      fillScale: d3.scaleLinear().domain([0, 1]).range([0.05, 1]),
       highlight: {
         strokeColor: 'white',
-        strokeWidth: 1.5,
+        strokeWidth: 1,
         opacity: 0.5,
       },
     },
     interaction: true,
-    variableName: 'perPopulation',
+    variableName: 'vaccinatedPerPopulation',
     spin: false,
     spinSpeed: 12000,
     spinToSpeed: 750,
     rotateChange: 3500,
     sentence:
-      "<span class='country'> {{ countryName }}</span> has vaccinated atleast <span class='percent'>58%</span> of its population.",
+      "<div class='country'> {{ countryName }}</div> <div class='text'><span class='percent'>{{oneDose}}</span> received at least one dose.</div> <div class='text fully-text'><span class='fully'>{{fully}}</span> have been fully vaccinated.</div>",
     topology: {
       getCountryFeatures: (topology) => topology.objects.countries,
       getDisputedBorderFeatures: (topology) =>
@@ -188,10 +186,13 @@ class VaccineMap {
       sphere
     );
     let useData = this.data();
-    useData.forEach(function (d) {
+
+    for (let i = 0; i < useData.length; i++) {
+      const d = useData[i]
       d.perPopulation = d.totalDoses / d.population;
+      d.vaccinatedPerPopulation = d.peopleVaccinated / d.population;
       d.fullyVaccinatedPerPop = d.peopleFullyVaccinated / d.population;
-    });
+    }
 
     useData = useData.filter((d) => d[props.variableName] > 0);
     const filteredCountryKeys = useData.map((d) => d.countryISO);
@@ -212,6 +213,12 @@ class VaccineMap {
           useData.filter((e) => e.countryISO === d.properties.isoAlpha2)[0][
             props.variableName
           ]
+        )
+      );
+
+      d.fully = numberScale(
+        parseFloat(
+          useData.filter((e) => e.countryISO === d.properties.isoAlpha2)[0].fullyVaccinatedPerPop
         )
       );
     });
@@ -243,15 +250,11 @@ class VaccineMap {
       .appendSelect('div.sentence')
       .html(
         Mustache.render(props.sentence, {
-          countryName: 'Israel',
-          percent: '58%',
+          countryName: 'Country',
+          oneDose: 'Percent',
+          fully: null,
         })
       );
-
-    sentence
-      .selectAll('.country, .percent')
-      .style('color', props.globe.colorFill)
-      .style('border-bottom', `${props.globe.colorFill} 1px solid`);
 
     const canvasContainer = this.selection()
       .appendSelect('div.canvas-container')
@@ -364,9 +367,18 @@ class VaccineMap {
         .select('.percent')
         .text(
           parseInt(
-            useData.filter(
-              (d) => d.countryISO === highlighted.properties.isoAlpha2
-            )[0][props.variableName] * 10000
+            highlighted.val * 10000
+          ) /
+            100 +
+            '%'
+        );
+      sentence
+        .select('.fully-text')
+        .classed('hide', d=> highlighted.fully>0 ? false : true)
+        .select('.fully')
+        .text(
+          parseInt(
+            highlighted.fully * 10000
           ) /
             100 +
             '%'

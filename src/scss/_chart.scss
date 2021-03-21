@@ -60,9 +60,18 @@ $VaccineMap-container: '#vaccine-map-container' !default;
     color: white;
     font-weight: 100;
     text-align: center;
+    .text{
+      font-size: 1rem;
+      line-height: 1.6rem;
+    }
     .country,
     .percent {
+      font-size: 1.3rem;
       font-weight: 600;
+    }
+
+    .fully-text.hide{
+      display: none;
     }
   }
 
