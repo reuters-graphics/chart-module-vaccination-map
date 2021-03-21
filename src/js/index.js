@@ -247,8 +247,8 @@ class VaccineMap {
     const voronoiCentroids = countryCentroids;
 
     const sentence = this.selection()
-      .appendSelect('div.sentence-container')
       .classed('mobile', width < props.breakpoint)
+      .appendSelect('div.sentence-container')
       .appendSelect('div.sentence')
       .html(
         Mustache.render(props.sentence, {
@@ -285,11 +285,11 @@ class VaccineMap {
       .appendSelect('svg')
       .attr('height', width)
       .attr('width', width)
-      .appendSelect('line.line')
+      .appendSelect('line.line.globe-ref-line')
       .style('stroke', props.globe.highlight.strokeColor)
       .attr('x1', `${width / 2}`)
       .attr('x2', `${width / 2}`)
-      .attr('y1', width > props.breakpoint?(sentence.node().getBoundingClientRect().y + 10):0)
+      .attr('y1', width > props.breakpoint ? (sentence.node().getBoundingClientRect().y + 10):0)
       .attr('y2', `${(width / 2) * 0.735}`);
 
     projection.rotate(this._rotation);
@@ -423,6 +423,7 @@ class VaccineMap {
       drawMap(projectedCentroid, selectedCountry);
       this._rotation = projection.rotate();
       rotateToPoint();
+      d3.select('line.line.globe-ref-line').attr('y1', width > props.breakpoint ? (sentence.node().getBoundingClientRect().y + 20) : 0);
     };
     const voronoiShapefile = geoVoronoi().polygons(voronoiCentroids).features;
 

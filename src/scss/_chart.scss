@@ -2,7 +2,7 @@
 @import '~@reuters-graphics/style-color/scss/thematic/brand';
 
 $VaccineMap-container: '#vaccine-map-container' !default;
-
+$dark-blue: #2f353f;
 #{$VaccineMap-container} {
   .canvas-container {
     position: relative;
@@ -58,9 +58,12 @@ $VaccineMap-container: '#vaccine-map-container' !default;
     position: absolute;
     top: 12%;
     width: 100%;
-    &.mobile{
-      position: relative;
-      top: 0%;
+  }
+
+  .mobile{
+    .sentence-container{
+          position: relative;
+          top: 0%;
     }
   }
 
@@ -72,7 +75,27 @@ $VaccineMap-container: '#vaccine-map-container' !default;
     text-align: center;
     max-width: 300px;
     margin: 0 auto;
+    box-shadow: none;
+    background: rgba(47,53,63,0.95);
+    border-radius: 4px;
+    padding: 4px 8px;
+    &:after {
+        box-shadow: none;
+        background: $dark-blue;
+        border-right: 1.4px solid white;
+        border-top: 1.4px solid white;
+      }
 
+    &:after {
+      display: block;
+      content: ' ';
+      background: #fff;
+      width: 10px;
+      height: 10px;
+      border-top-right-radius: 2px;
+      box-shadow: 1px -2px -1px rgba(0,0,0,0.19);
+      position: absolute;
+    }
     .text{
       font-size: 1rem;
       line-height: 1.6rem;
