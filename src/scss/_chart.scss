@@ -84,16 +84,12 @@ $dark-blue: #2f353f;
         background: $dark-blue;
         border-right: 1.4px solid white;
         border-top: 1.4px solid white;
-      }
-
-    &:after {
+        transform: rotate(135deg);
       display: block;
       content: ' ';
-      background: #fff;
       width: 10px;
       height: 10px;
       border-top-right-radius: 2px;
-      box-shadow: 1px -2px -1px rgba(0,0,0,0.19);
       position: absolute;
     }
     .text{
