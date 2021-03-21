@@ -289,7 +289,7 @@ class VaccineMap {
       .style('stroke', props.globe.highlight.strokeColor)
       .attr('x1', `${width / 2}`)
       .attr('x2', `${width / 2}`)
-      .attr('y1', width>props.breakpoint?(sentence.node().getBoundingClientRect().y + 10):0)
+      .attr('y1', width > props.breakpoint?(sentence.node().getBoundingClientRect().y + 10):0)
       .attr('y2', `${(width / 2) * 0.735}`);
 
     projection.rotate(this._rotation);
@@ -368,11 +368,16 @@ class VaccineMap {
       sentence
         .select('.percent')
         .text(
-          parseInt(
-            highlighted.val * 10000
-          ) /
-            100 +
-            '%'
+          () => {
+            const text = (parseInt(
+              highlighted.val * 10000
+            ) / 100) + '%';
+            if (highlighted.val < .01) {
+              return 'less than 1%'
+            } else {
+              return text
+            }
+          }
         );
       sentence
         .select('.fully-text')
