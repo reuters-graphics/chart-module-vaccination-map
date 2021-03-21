@@ -28,6 +28,7 @@
     "d3-appendselect": "^0.1.0",
     "d3-array": "^2.11.0",
     "d3-axis": "^2.0.0",
+    "d3-drag": "^2.0.0",
     "d3-geo": "^2.0.1",
     "d3-geo-voronoi": "^1.6.0",
     "d3-inertia": "^0.4.0",
