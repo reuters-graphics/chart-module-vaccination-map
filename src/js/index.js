@@ -280,7 +280,6 @@ class VaccineMap {
     //   .style('pointer-events', 'none')
     //   .selectAll('path.voronoi')
     //   .data()
-    console.log(sentence.node().getBoundingClientRect())
     const line = canvasContainer
       .appendSelect('svg')
       .attr('height', width)
@@ -289,7 +288,7 @@ class VaccineMap {
       .style('stroke', props.globe.highlight.strokeColor)
       .attr('x1', `${width / 2}`)
       .attr('x2', `${width / 2}`)
-      .attr('y1', width > props.breakpoint ? (sentence.node().getBoundingClientRect().y + 10):0)
+      .attr('y1', width > props.breakpoint ? (d3.select('.sentence-container').node().getBoundingClientRect().y):5)
       .attr('y2', `${(width / 2) * 0.735}`);
 
     projection.rotate(this._rotation);
@@ -373,15 +372,15 @@ class VaccineMap {
               highlighted.val * 10000
             ) / 100) + '%';
             if (highlighted.val < .01) {
-              return 'less than 1%'
+              return '<1%';
             } else {
-              return text
+              return text;
             }
           }
         );
       sentence
         .select('.fully-text')
-        .classed('hide', d=> highlighted.fully>0 ? false : true)
+        .classed('hide', highlighted.fully<0)
         .select('.fully')
         .text(
           parseInt(
@@ -423,7 +422,7 @@ class VaccineMap {
       drawMap(projectedCentroid, selectedCountry);
       this._rotation = projection.rotate();
       rotateToPoint();
-      d3.select('line.line.globe-ref-line').attr('y1', width > props.breakpoint ? (sentence.node().getBoundingClientRect().y + 20) : 0);
+      d3.select('line.line.globe-ref-line').attr('y1', width > props.breakpoint ? (d3.select('.sentence-container').node().getBoundingClientRect().y) : 5);
     };
     const voronoiShapefile = geoVoronoi().polygons(voronoiCentroids).features;
 
