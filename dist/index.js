@@ -1845,8 +1845,6 @@ versor.delta = function(v0, v1, alpha) {
   return [cos(t), w[2] / l * s, -w[1] / l * s, w[0] / l * s];
 };
 
-// import { geoVoronoi } from 'd3-geo-voronoi';
-
 d3.selection.prototype.appendSelect = d3Appendselect.appendSelect;
 /**
  * Write your chart as a class with a single draw method that draws
@@ -1877,16 +1875,7 @@ var VaccineMap = /*#__PURE__*/function () {
     }]);
 
     _defineProperty(this, "defaultProps", {
-      heightRatio: function heightRatio(width, breakpoint) {
-        return width < breakpoint ? 0.8 : 0.5;
-      },
       locale: 'en',
-      getDataRange: function getDataRange(width) {
-        return {
-          min: 0,
-          max: 1
-        };
-      },
       borders: {
         strokeColor: '#2f353f',
         strokeWidth: 0.5,
@@ -1901,22 +1890,20 @@ var VaccineMap = /*#__PURE__*/function () {
         strokeColor: 'rgba(255, 255, 255, 0.5)',
         strokeWidth: 0.1,
         landFill: 'rgba(153,153,153,0.2)',
-        verticalAxisTilt: 15,
+        verticalAxisTilt: 8,
         colorFill: '#22BD3B',
-        fillScale: d3.scaleLinear().domain([0, 1]).range([0.07, 1]),
+        fillScale: d3.scaleLinear().domain([0, 1]).range([0.05, 1]),
         highlight: {
-          strokeColor: 'white',
-          strokeWidth: 1.5,
-          opacity: 0.5
+          strokeColor: 'rgba(255,255,255,.65)',
+          strokeWidth: 1
         }
       },
-      interaction: true,
-      variableName: 'perPopulation',
+      variableName: 'vaccinatedPerPopulation',
       spin: false,
-      spinSpeed: 12000,
       spinToSpeed: 750,
       rotateChange: 3500,
-      sentence: "<span class='country'> {{ countryName }}</span> has vaccinated atleast <span class='percent'>58%</span> of its population.",
+      breakpoint: 600,
+      sentence: "<div class='country'> {{ countryName }}</div> <div class='text'><span class='percent'>{{oneDose}}</span> received at least one dose.</div> <div class='text fully-text'><span class='fully'>{{fully}}</span> have been fully vaccinated.</div>",
       topology: {
         getCountryFeatures: function getCountryFeatures(topology) {
           return topology.objects.countries;
@@ -2044,7 +2031,7 @@ var VaccineMap = /*#__PURE__*/function () {
       all._context.fill();
 
       if (highlight) {
-        all._context.globalAlpha = globe.highlight.opacity;
+        all._context.globalAlpha = 1;
         all._context.strokeStyle = globe.highlight.strokeColor;
         all._context.lineWidth = globe.highlight.strokeWidth;
 
@@ -2082,10 +2069,14 @@ var VaccineMap = /*#__PURE__*/function () {
 
       var projection = d3.geoOrthographic().fitExtent([[10, 10], [width - 10, width - 10]], sphere);
       var useData = this.data();
-      useData.forEach(function (d) {
+
+      for (var i = 0; i < useData.length; i++) {
+        var d = useData[i];
         d.perPopulation = d.totalDoses / d.population;
+        d.vaccinatedPerPopulation = d.peopleVaccinated / d.population;
         d.fullyVaccinatedPerPop = d.peopleFullyVaccinated / d.population;
-      });
+      }
+
       useData = useData.filter(function (d) {
         return d[props.variableName] > 0;
       });
@@ -2105,6 +2096,9 @@ var VaccineMap = /*#__PURE__*/function () {
         d.val = numberScale(parseFloat(useData.filter(function (e) {
           return e.countryISO === d.properties.isoAlpha2;
         })[0][props.variableName]));
+        d.fully = numberScale(parseFloat(useData.filter(function (e) {
+          return e.countryISO === d.properties.isoAlpha2;
+        })[0].fullyVaccinatedPerPop));
       });
       var filteredCountriesRandom = filteredCountries.filter(function (d) {
         return d.val > 0.01;
@@ -2123,11 +2117,11 @@ var VaccineMap = /*#__PURE__*/function () {
         };
       });
       var voronoiCentroids = countryCentroids;
-      var sentence = this.selection().appendSelect('div.sentence').html(Mustache__default['default'].render(props.sentence, {
-        countryName: 'Israel',
-        percent: '58%'
+      var sentence = this.selection().classed('mobile', width < props.breakpoint).appendSelect('div.sentence-container').appendSelect('div.sentence').html(Mustache__default['default'].render(props.sentence, {
+        countryName: 'Country',
+        oneDose: 'Percent',
+        fully: null
       }));
-      sentence.selectAll('.country, .percent').style('color', props.globe.colorFill).style('border-bottom', "".concat(props.globe.colorFill, " 1px solid"));
       var canvasContainer = this.selection().appendSelect('div.canvas-container').style('width', "".concat(width, "px")).style('height', "".concat(width, "px"));
       var canvas = canvasContainer.appendSelect('canvas').attr('width', width * 2).attr('height', width * 2).style('width', "".concat(width, "px")).style('height', "".concat(width, "px")); // const svg = canvasContainer
       //   .appendSelect('svg.veronoi')
@@ -2139,7 +2133,7 @@ var VaccineMap = /*#__PURE__*/function () {
       //   .selectAll('path.voronoi')
       //   .data()
 
-      var line = canvasContainer.appendSelect('svg').attr('height', width).attr('width', width).appendSelect('line.line').style('stroke', props.globe.highlight.strokeColor).attr('x1', "".concat(width / 2)).attr('x2', "".concat(width / 2)).attr('y1', "0").attr('y2', "".concat(width / 2 * 0.735));
+      var line = canvasContainer.appendSelect('svg').attr('height', width).attr('width', width).appendSelect('line.line.globe-ref-line').style('stroke', props.globe.highlight.strokeColor).attr('x1', "".concat(width / 2)).attr('x2', "".concat(width / 2)).attr('y1', width > props.breakpoint ? d3.select('.sentence-container').node().getBoundingClientRect().y : 5).attr('y2', "".concat(width / 2 * 0.735));
       projection.rotate(this._rotation);
       this._context = canvas.node().getContext('2d');
 
@@ -2192,9 +2186,16 @@ var VaccineMap = /*#__PURE__*/function () {
         var p = projection(highlighted.properties.centroid);
         line.attr('x2', "".concat(p[0])).attr('y2', "".concat(p[1]));
         sentence.select('.country').text(highlighted.properties.name);
-        sentence.select('.percent').text(parseInt(useData.filter(function (d) {
-          return d.countryISO === highlighted.properties.isoAlpha2;
-        })[0][props.variableName] * 10000) / 100 + '%');
+        sentence.select('.percent').text(function () {
+          var text = parseInt(highlighted.val * 10000) / 100 + '%';
+
+          if (highlighted.val < 0.01) {
+            return '<1%';
+          } else {
+            return text;
+          }
+        });
+        sentence.select('.fully-text').classed('hide', highlighted.fully < 0).select('.fully').text(parseInt(highlighted.fully * 10000) / 100 + '%');
       };
 
       var rotateToPoint = function rotateToPoint() {
@@ -2220,6 +2221,7 @@ var VaccineMap = /*#__PURE__*/function () {
         drawMap(projectedCentroid, selectedCountry);
         _this._rotation = projection.rotate();
         rotateToPoint();
+        d3.select('line.line.globe-ref-line').attr('y1', width > props.breakpoint ? d3.select('.sentence-container').node().getBoundingClientRect().y + d3.select('.sentence-container').node().getBoundingClientRect().height : 5);
       };
 
       var voronoiShapefile = d3GeoVoronoi.geoVoronoi().polygons(voronoiCentroids).features;
@@ -2227,9 +2229,9 @@ var VaccineMap = /*#__PURE__*/function () {
       var onClickSelect = function onClickSelect(event) {
         var clickedPoint = projection.invert(d3.pointer(event));
 
-        for (var i = 0; i < voronoiShapefile.length; i++) {
-          if (d3.geoContains(voronoiShapefile[i], clickedPoint)) {
-            selectedCountry = voronoiShapefile[i].properties.site.actualFile;
+        for (var _i = 0; _i < voronoiShapefile.length; _i++) {
+          if (d3.geoContains(voronoiShapefile[_i], clickedPoint)) {
+            selectedCountry = voronoiShapefile[_i].properties.site.actualFile;
             break;
           }
         }
@@ -2241,10 +2243,10 @@ var VaccineMap = /*#__PURE__*/function () {
         var clickedPoint = projection.invert([width / 2, width / 2]);
         var chosenObj;
 
-        for (var i = 0; i < voronoiShapefile.length; i++) {
-          if (d3.geoContains(voronoiShapefile[i], clickedPoint)) {
+        for (var _i2 = 0; _i2 < voronoiShapefile.length; _i2++) {
+          if (d3.geoContains(voronoiShapefile[_i2], clickedPoint)) {
             // selectedCountry = voronoiShapefile[i].properties.site.actualFile;
-            chosenObj = voronoiShapefile[i].properties.site.actualFile;
+            chosenObj = voronoiShapefile[_i2].properties.site.actualFile;
             break;
           }
         }
@@ -2307,9 +2309,10 @@ var VaccineMap = /*#__PURE__*/function () {
           var q1 = versor.multiply(q0, delta); // For multitouch, compose with a rotation around the axis.
 
           if (p[2]) {
-            var d = (p[2] - a0) / 2;
-            var s = -Math.sin(d);
-            var c = Math.sign(Math.cos(d));
+            var _d = (p[2] - a0) / 2;
+
+            var s = -Math.sin(_d);
+            var c = Math.sign(Math.cos(_d));
             q1 = versor.multiply([Math.sqrt(1 - s * s), 0, 0, c * s], q1);
           }
 

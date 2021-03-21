@@ -4,20 +4,20 @@
 $VaccineMap-container: '#vaccine-map-container' !default;
 $dark-blue: #2f353f;
 #{$VaccineMap-container} {
-  &.mobile{
-    .sentence-container{
-        position: relative;
-        top: 0%;
-        .sentence::after{
-          margin-top: -3px;
+  &.mobile {
+    .sentence-container {
+      position: relative;
+      top: 0%;
+      .sentence::after {
+        margin-top: -3px;
+      }
+      .sentence {
+        .country,
+        .percent {
+          font-size: 1.1rem;
         }
-        .sentence{
-          .country,.percent{
-            font-size: 1.1rem;
-          }
-        }
+      }
     }
-
   }
   .canvas-container {
     position: relative;
@@ -69,13 +69,12 @@ $dark-blue: #2f353f;
       display: none;
     }
   }
-  .sentence-container{
+  .sentence-container {
     position: absolute;
     top: 12%;
     width: 100%;
+    z-index: 1000;
   }
-
-  
 
   .sentence {
     font-size: 1.3rem;
@@ -86,7 +85,8 @@ $dark-blue: #2f353f;
     max-width: 320px;
     margin: 0 auto;
     box-shadow: none;
-    background: rgba(47,53,63,0.95);
+    background: rgba(47, 53, 63, 0.8);
+    background: none;
     border-radius: 4px;
     padding: 4px 8px;
     &:after {
@@ -104,7 +104,7 @@ $dark-blue: #2f353f;
       margin-left: -3px;
       transform: rotate(135deg);
     }
-    .text{
+    .text {
       font-size: 1rem;
       line-height: 1.6rem;
     }
@@ -114,11 +114,10 @@ $dark-blue: #2f353f;
       font-weight: 600;
     }
 
-    .fully-text.hide{
+    .fully-text.hide {
       display: none;
     }
   }
-
 
   .line {
     position: absolute;

@@ -61,7 +61,6 @@ class VaccineMap {
    */
   defaultProps = {
     locale: 'en',
-    getDataRange: (width) => ({ min: 0, max: 1 }),
     borders: {
       strokeColor: '#2f353f',
       strokeWidth: 0.5,
@@ -80,15 +79,12 @@ class VaccineMap {
       colorFill: '#22BD3B',
       fillScale: d3.scaleLinear().domain([0, 1]).range([0.05, 1]),
       highlight: {
-        strokeColor: 'white',
+        strokeColor: 'rgba(255,255,255,.65)',
         strokeWidth: 1,
-        opacity: 0.5,
       },
     },
-    interaction: true,
     variableName: 'vaccinatedPerPopulation',
     spin: false,
-    spinSpeed: 12000,
     spinToSpeed: 750,
     rotateChange: 3500,
     breakpoint: 600,
@@ -149,7 +145,7 @@ class VaccineMap {
     all._context.fill();
 
     if (highlight) {
-      all._context.globalAlpha = globe.highlight.opacity;
+      all._context.globalAlpha = 1;
       all._context.strokeStyle = globe.highlight.strokeColor;
       all._context.lineWidth = globe.highlight.strokeWidth;
       all._context.stroke();
@@ -188,7 +184,7 @@ class VaccineMap {
     let useData = this.data();
 
     for (let i = 0; i < useData.length; i++) {
-      const d = useData[i]
+      const d = useData[i];
       d.perPopulation = d.totalDoses / d.population;
       d.vaccinatedPerPopulation = d.peopleVaccinated / d.population;
       d.fullyVaccinatedPerPop = d.peopleFullyVaccinated / d.population;
@@ -218,7 +214,8 @@ class VaccineMap {
 
       d.fully = numberScale(
         parseFloat(
-          useData.filter((e) => e.countryISO === d.properties.isoAlpha2)[0].fullyVaccinatedPerPop
+          useData.filter((e) => e.countryISO === d.properties.isoAlpha2)[0]
+            .fullyVaccinatedPerPop
         )
       );
     });
@@ -288,7 +285,12 @@ class VaccineMap {
       .style('stroke', props.globe.highlight.strokeColor)
       .attr('x1', `${width / 2}`)
       .attr('x2', `${width / 2}`)
-      .attr('y1', width > props.breakpoint ? (d3.select('.sentence-container').node().getBoundingClientRect().y):5)
+      .attr(
+        'y1',
+        width > props.breakpoint
+          ? d3.select('.sentence-container').node().getBoundingClientRect().y
+          : 5
+      )
       .attr('y2', `${(width / 2) * 0.735}`);
 
     projection.rotate(this._rotation);
@@ -364,31 +366,19 @@ class VaccineMap {
       line.attr('x2', `${p[0]}`).attr('y2', `${p[1]}`);
 
       sentence.select('.country').text(highlighted.properties.name);
-      sentence
-        .select('.percent')
-        .text(
-          () => {
-            const text = (parseInt(
-              highlighted.val * 10000
-            ) / 100) + '%';
-            if (highlighted.val < .01) {
-              return '<1%';
-            } else {
-              return text;
-            }
-          }
-        );
+      sentence.select('.percent').text(() => {
+        const text = parseInt(highlighted.val * 10000) / 100 + '%';
+        if (highlighted.val < 0.01) {
+          return '<1%';
+        } else {
+          return text;
+        }
+      });
       sentence
         .select('.fully-text')
-        .classed('hide', highlighted.fully<0)
+        .classed('hide', highlighted.fully < 0)
         .select('.fully')
-        .text(
-          parseInt(
-            highlighted.fully * 10000
-          ) /
-            100 +
-            '%'
-        );
+        .text(parseInt(highlighted.fully * 10000) / 100 + '%');
     };
 
     const rotateToPoint = () => {
@@ -422,7 +412,14 @@ class VaccineMap {
       drawMap(projectedCentroid, selectedCountry);
       this._rotation = projection.rotate();
       rotateToPoint();
-      d3.select('line.line.globe-ref-line').attr('y1', width > props.breakpoint ? (d3.select('.sentence-container').node().getBoundingClientRect().y) : 5);
+      d3.select('line.line.globe-ref-line').attr(
+        'y1',
+        width > props.breakpoint
+          ? d3.select('.sentence-container').node().getBoundingClientRect().y +
+              d3.select('.sentence-container').node().getBoundingClientRect()
+                .height
+          : 5
+      );
     };
     const voronoiShapefile = geoVoronoi().polygons(voronoiCentroids).features;
 
