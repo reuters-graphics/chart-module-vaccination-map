@@ -74,6 +74,8 @@ $dark-blue: #2f353f;
     top: 12%;
     width: 100%;
     z-index: 1000;
+    min-height: 90px;
+    vertical-align: bottom;
   }
 
   .sentence {
@@ -85,8 +87,7 @@ $dark-blue: #2f353f;
     max-width: 320px;
     margin: 0 auto;
     box-shadow: none;
-    background: rgba(47, 53, 63, 0.8);
-    background: none;
+    background: rgba(47, 53, 63, 0.5);
     border-radius: 4px;
     padding: 4px 8px;
     &:after {

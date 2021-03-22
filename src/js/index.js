@@ -88,7 +88,7 @@ class VaccineMap {
     spinToSpeed: 750,
     rotateChange: 3500,
     breakpoint: 600,
-    stopShow: true,
+    stopShow: false,
     sentence:
       "<div class='country'> {{ countryName }}</div> <div class='text'><span class='percent'>{{oneDose}}</span> received at least one dose.</div> <div class='text fully-text'><span class='fully'>{{fully}}</span> have been fully vaccinated.</div>",
     topology: {
@@ -268,16 +268,6 @@ class VaccineMap {
       .style('width', `${width}px`)
       .style('height', `${width}px`);
 
-    // const svg = canvasContainer
-    //   .appendSelect('svg.veronoi')
-    //   .attr('width', width)
-    //   .attr('height', width)
-
-    // const countryVoronoiCentroids = svg.appendSelect('g.voronoi')
-    //   .style('fill', 'none')
-    //   .style('pointer-events', 'none')
-    //   .selectAll('path.voronoi')
-    //   .data()
     const line = canvasContainer
       .appendSelect('svg')
       .attr('height', width)
@@ -289,7 +279,7 @@ class VaccineMap {
       .attr(
         'y1',
         width > props.breakpoint
-          ? d3.select('.sentence-container').node().getBoundingClientRect().y
+          ? d3.select('.sentence-container').node().getBoundingClientRect().height + (width*.12) + 10
           : 5
       )
       .attr('y2', `${(width / 2) * 0.735}`);
@@ -308,42 +298,6 @@ class VaccineMap {
 
     let destination = [];
     destination = selectedCountry.properties.centroid;
-
-    const geoPath = d3.geoPath(
-      d3
-        .geoOrthographic()
-        .fitExtent(
-          [
-            [10, 10],
-            [width - 10, width - 10],
-          ],
-          sphere
-        )
-        .rotate([
-          -destination[0],
-          props.globe.verticalAxisTilt - destination[1],
-        ]),
-      this._context
-    );
-
-    // countryVoronoiCentroids.enter()
-    //   .append('path')
-    //   .attr('class', d => 'voronoi')
-    //   .merge(countryVoronoiCentroids)
-    //   .attr('d', this._pathCheck)
-    //   .on('mouseover', d => {
-    //     // if (props.interaction) {
-    //     //   tipOn(d);
-    //     // }
-    //   })
-    //   .on('mouseout', d => {
-    //     // if (props.interaction) {
-    //     //   tipOff(d);
-    //     // }
-    //   });
-
-    // countryVoronoiCentroids.exit()
-    //   .remove();
 
     const dC = this._drawCountries;
     const drawMap = (projectedCentroid, highlighted) => {
@@ -413,14 +367,13 @@ class VaccineMap {
       drawMap(projectedCentroid, selectedCountry);
       this._rotation = projection.rotate();
       rotateToPoint();
-      d3.select('line.line.globe-ref-line').attr(
-        'y1',
-        width > props.breakpoint
-          ? d3.select('.sentence-container').node().getBoundingClientRect().y +
-              d3.select('.sentence-container').node().getBoundingClientRect()
-                .height
-          : 5
-      );
+      d3.select('line.line.globe-ref-line')
+        .attr(
+          'y1',
+          width > props.breakpoint
+            ? d3.select('.sentence-container').node().getBoundingClientRect().height + (width*.12) + 10
+            : (selectedCountry.fully ? 5 : 0)
+        );
     };
     const voronoiShapefile = geoVoronoi().polygons(voronoiCentroids).features;
 
