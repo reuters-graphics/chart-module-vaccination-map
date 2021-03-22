@@ -88,6 +88,7 @@ class VaccineMap {
     spinToSpeed: 750,
     rotateChange: 3500,
     breakpoint: 600,
+    stopShow: true,
     sentence:
       "<div class='country'> {{ countryName }}</div> <div class='text'><span class='percent'>{{oneDose}}</span> received at least one dose.</div> <div class='text fully-text'><span class='fully'>{{fully}}</span> have been fully vaccinated.</div>",
     topology: {
@@ -158,11 +159,11 @@ class VaccineMap {
    */
 
   draw() {
+    const props = this.props();
     if (window.globeTimer) {
       window.globeTimer.stop();
       window.globeTimer = null;
     }
-    const props = this.props();
     const topology = this.geo();
     if (!topology) return this;
 
@@ -464,6 +465,10 @@ class VaccineMap {
     } else {
       loopCountries();
       window.globeTimer = d3.interval(loopCountries, props.rotateChange);
+    }
+
+    if (props.stopShow) {
+      resetTimer()
     }
 
     function drag(projection) {

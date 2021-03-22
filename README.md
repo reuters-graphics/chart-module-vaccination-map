@@ -63,6 +63,9 @@ chart
       // When to move the tooltip off the globe and above the globe. Mention width.
       breakpoint: 600,
 
+      // Stop auto play
+      stopShow: false,
+      
       // Tooltip text
       sentence:
         "<div class='country'> {{ countryName }}</div> <div class='text'><span class='percent'>{{oneDose}}</span> received at least one dose.</div> <div class='text fully-text'><span class='fully'>{{fully}}</span> have been fully vaccinated.</div>",
