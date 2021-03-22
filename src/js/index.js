@@ -7,7 +7,7 @@ import * as d3 from 'd3';
 import { geoVoronoi } from 'd3-geo-voronoi';
 import versor from 'versor/src/index.js';
 import Mustache from 'mustache';
-import spin from './spin.js'
+import spin from './spin.js';
 d3.selection.prototype.appendSelect = appendSelect;
 
 /**
@@ -248,11 +248,7 @@ class VaccineMap {
 
     const spinMe = this.selection()
       .appendSelect('div.spin-me')
-      .html(
-        spin
-        +
-        `<div class="spin-text">${props.spinText}</div>`
-      );
+      .html(spin + `<div class="spin-text">${props.spinText}</div>`);
 
     const sentence = this.selection()
       .classed('mobile', width < props.breakpoint)

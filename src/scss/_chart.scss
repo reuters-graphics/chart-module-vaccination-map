@@ -4,7 +4,6 @@
 $VaccineMap-container: '#vaccine-map-container' !default;
 $dark-blue: #2f353f;
 #{$VaccineMap-container} {
-  
   .canvas-container {
     position: relative;
     width: 100%;
@@ -111,19 +110,19 @@ $dark-blue: #2f353f;
     position: absolute;
   }
 
-  .spin-me{
+  .spin-me {
     pointer-events: none;
     position: absolute;
     margin-left: 10px;
     margin-top: 10px;
     text-align: center;
-    svg{
+    svg {
       width: 25px;
       margin: 0 auto;
       transform: rotate(-30deg);
     }
-    .spin-text{
-      color: rgba(255,255,255,.75);
+    .spin-text {
+      color: rgba(255, 255, 255, 0.75);
     }
   }
 
@@ -142,12 +141,11 @@ $dark-blue: #2f353f;
       }
     }
 
-    .spin-me{
+    .spin-me {
       right: 3%;
       bottom: 5%;
       margin-left: 0;
       margin-top: 0;
-      
     }
   }
 }
