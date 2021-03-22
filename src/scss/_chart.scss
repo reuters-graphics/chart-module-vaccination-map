@@ -4,21 +4,7 @@
 $VaccineMap-container: '#vaccine-map-container' !default;
 $dark-blue: #2f353f;
 #{$VaccineMap-container} {
-  &.mobile {
-    .sentence-container {
-      position: relative;
-      top: 0%;
-      .sentence::after {
-        margin-top: -3px;
-      }
-      .sentence {
-        .country,
-        .percent {
-          font-size: 1.1rem;
-        }
-      }
-    }
-  }
+  
   .canvas-container {
     position: relative;
     width: 100%;
@@ -76,6 +62,7 @@ $dark-blue: #2f353f;
     z-index: 1000;
     min-height: 90px;
     vertical-align: bottom;
+    pointer-events: none;
   }
 
   .sentence {
@@ -122,5 +109,45 @@ $dark-blue: #2f353f;
 
   .line {
     position: absolute;
+  }
+
+  .spin-me{
+    pointer-events: none;
+    position: absolute;
+    margin-left: 10px;
+    margin-top: 10px;
+    text-align: center;
+    svg{
+      width: 25px;
+      margin: 0 auto;
+      transform: rotate(-30deg);
+    }
+    .spin-text{
+      color: rgba(255,255,255,.75);
+    }
+  }
+
+  &.mobile {
+    .sentence-container {
+      position: relative;
+      top: 0%;
+      .sentence::after {
+        margin-top: -3px;
+      }
+      .sentence {
+        .country,
+        .percent {
+          font-size: 1.1rem;
+        }
+      }
+    }
+
+    .spin-me{
+      right: 3%;
+      bottom: 5%;
+      margin-left: 0;
+      margin-top: 0;
+      
+    }
   }
 }

@@ -2164,8 +2164,8 @@ var VaccineMap = /*#__PURE__*/function () {
         sentence.select('.percent').text(function () {
           var text = parseInt(highlighted.val * 10000) / 100 + '%';
 
-          if (highlighted.val < 0.01) {
-            return '<1%';
+          if (highlighted.val < 0.001) {
+            return '<0.1%';
           } else {
             return text;
           }

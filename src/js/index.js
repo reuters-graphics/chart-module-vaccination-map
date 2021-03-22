@@ -7,7 +7,7 @@ import * as d3 from 'd3';
 import { geoVoronoi } from 'd3-geo-voronoi';
 import versor from 'versor/src/index.js';
 import Mustache from 'mustache';
-
+import spin from './spin.js'
 d3.selection.prototype.appendSelect = appendSelect;
 
 /**
@@ -89,6 +89,7 @@ class VaccineMap {
     rotateChange: 3500,
     breakpoint: 600,
     stopShow: false,
+    spinText: 'Spin me',
     sentence:
       "<div class='country'> {{ countryName }}</div> <div class='text'><span class='percent'>{{oneDose}}</span> received at least one dose.</div> <div class='text fully-text'><span class='fully'>{{fully}}</span> have been fully vaccinated.</div>",
     topology: {
@@ -199,6 +200,7 @@ class VaccineMap {
     const filteredCountries = countries.features.filter((d) =>
       filteredCountryKeys.includes(d.properties.isoAlpha2)
     );
+
     const numberScale = d3
       .scaleLinear()
       .domain(d3.extent(useData, (d) => parseFloat(d[props.variableName])))
@@ -243,6 +245,14 @@ class VaccineMap {
       }));
 
     const voronoiCentroids = countryCentroids;
+
+    const spinMe = this.selection()
+      .appendSelect('div.spin-me')
+      .html(
+        spin
+        +
+        `<div class="spin-text">${props.spinText}</div>`
+      );
 
     const sentence = this.selection()
       .classed('mobile', width < props.breakpoint)
@@ -326,8 +336,8 @@ class VaccineMap {
       sentence.select('.country').text(highlighted.properties.name);
       sentence.select('.percent').text(() => {
         const text = parseInt(highlighted.val * 10000) / 100 + '%';
-        if (highlighted.val < 0.01) {
-          return '<1%';
+        if (highlighted.val < 0.001) {
+          return '<0.1%';
         } else {
           return text;
         }
