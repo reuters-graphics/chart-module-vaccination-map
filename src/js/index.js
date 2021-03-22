@@ -279,7 +279,10 @@ class VaccineMap {
       .attr(
         'y1',
         width > props.breakpoint
-          ? d3.select('.sentence-container').node().getBoundingClientRect().height + (width*.12) + 10
+          ? d3.select('.sentence-container').node().getBoundingClientRect()
+              .height +
+              width * 0.12 +
+              10
           : 5
       )
       .attr('y2', `${(width / 2) * 0.735}`);
@@ -367,13 +370,17 @@ class VaccineMap {
       drawMap(projectedCentroid, selectedCountry);
       this._rotation = projection.rotate();
       rotateToPoint();
-      d3.select('line.line.globe-ref-line')
-        .attr(
-          'y1',
-          width > props.breakpoint
-            ? d3.select('.sentence-container').node().getBoundingClientRect().height + (width*.12) + 10
-            : (selectedCountry.fully ? 5 : 0)
-        );
+      d3.select('line.line.globe-ref-line').attr(
+        'y1',
+        width > props.breakpoint
+          ? d3.select('.sentence-container').node().getBoundingClientRect()
+              .height +
+              width * 0.12 +
+              10
+          : selectedCountry.fully
+          ? 5
+          : 0
+      );
     };
     const voronoiShapefile = geoVoronoi().polygons(voronoiCentroids).features;
 
@@ -421,7 +428,7 @@ class VaccineMap {
     }
 
     if (props.stopShow) {
-      resetTimer()
+      resetTimer();
     }
 
     function drag(projection) {

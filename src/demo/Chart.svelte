@@ -15,12 +15,12 @@ Follow the notes below! -->
   // 🎚️ Create variables for any data or props you want users to be able
   // to update in the demo. (And write buttons to update them below!)
   let defaultGeo = topo;
-  let autoPlay = false
+  let autoPlay = false;
   // ...
 
   // 🎈 Tie your custom props back together into one chartProps object.
   $: chartProps = {
-    stopShow: autoPlay
+    stopShow: autoPlay,
   };
 
   afterUpdate(() => {
@@ -40,14 +40,16 @@ Follow the notes below! -->
 
 <div class="chart-options">
   <!-- ✏️ Create buttons that update your data/props variables when they're clicked! -->
-   <button
-    on:click={() => {
-      autoPlay = false
-    }}>Auto Play</button>
   <button
     on:click={() => {
-      autoPlay = true
-    }}>Stop Play</button>
+      autoPlay = false;
+    }}>Auto Play</button
+  >
+  <button
+    on:click={() => {
+      autoPlay = true;
+    }}>Stop Play</button
+  >
 </div>
 
 <!-- ⚙️ These components will automatically create interactive documentation for you chart! -->
