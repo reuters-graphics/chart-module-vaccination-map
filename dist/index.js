@@ -2122,19 +2122,24 @@ var VaccineMap = /*#__PURE__*/function () {
      */
 
   }, {
+    key: "_clearTimer",
+    value: function _clearTimer() {
+      if (this.globeTimer) {
+        this.globeTimer.stop();
+        this.globeTimer = null;
+      }
+    }
+  }, {
     key: "draw",
     value: function draw() {
       var _this = this;
 
       var props = this.props();
-
-      if (window.globeTimer) {
-        window.globeTimer.stop();
-        window.globeTimer = null;
-      }
-
       var topology = this.geo();
       if (!topology) return this;
+
+      this._clearTimer();
+
       var countriesFeatures = props.topology.getCountryFeatures(topology);
       var disputedBoundariesFeatures = props.topology.getDisputedBorderFeatures(topology);
       var landFeatures = props.topology.getLandFeatures(topology);
@@ -2307,35 +2312,21 @@ var VaccineMap = /*#__PURE__*/function () {
         drawMap(false, chosenObj);
       };
 
-      var resetTimer = function resetTimer() {
-        if (window.globeTimer) {
-          window.globeTimer.stop();
-          window.globeTimer = null;
-        }
-      };
-
-      if (window.globeTimer) {
-        resetTimer();
-        window.globeTimer = d3.interval(loopCountries, props.rotateChange);
-      } else {
+      if (!props.stopShow) {
         loopCountries();
-        window.globeTimer = d3.interval(loopCountries, props.rotateChange);
+        this.globeTimer = d3.interval(loopCountries, props.rotateChange);
       }
 
-      if (props.stopShow) {
-        resetTimer();
-      }
-
-      function drag(projection) {
+      var drag = function drag(projection) {
         var v0, q0, r0, a0, l;
 
-        function pointer(event, that) {
-          var t = d3.pointers(event, that);
+        var pointer = function pointer(event) {
+          var t = d3.pointers(event, canvas.node());
 
           if (t.length !== l) {
             l = t.length;
             if (l > 1) a0 = Math.atan2(t[1][1] - t[0][1], t[1][0] - t[0][0]);
-            dragstarted.apply(that, [event, that]);
+            dragstarted.apply(canvas.node(), [event]);
           } // For multitouch, average positions and compute rotation.
 
 
@@ -2351,16 +2342,17 @@ var VaccineMap = /*#__PURE__*/function () {
           }
 
           return t[0];
-        }
+        };
 
-        function dragstarted(event) {
-          resetTimer();
-          v0 = versor.cartesian(projection.invert(pointer(event, this)));
+        var dragstarted = function dragstarted(event) {
+          _this._clearTimer();
+
+          v0 = versor.cartesian(projection.invert(pointer(event)));
           q0 = versor(r0 = projection.rotate());
-        }
+        };
 
-        function dragged(event) {
-          var p = pointer(event, this);
+        var dragged = function dragged(event) {
+          var p = pointer(event);
           var v1 = versor.cartesian(projection.rotate(r0).invert(p));
           var delta = versor.delta(v0, v1);
           var q1 = versor.multiply(q0, delta); // For multitouch, compose with a rotation around the axis.
@@ -2374,19 +2366,18 @@ var VaccineMap = /*#__PURE__*/function () {
           }
 
           var _versor$rotation = versor.rotation(q1),
-              _versor$rotation2 = _slicedToArray(_versor$rotation, 3),
+              _versor$rotation2 = _slicedToArray(_versor$rotation, 2),
               lambda = _versor$rotation2[0],
               phi = _versor$rotation2[1];
-              _versor$rotation2[2];
 
           projection.rotate([lambda, phi, 0]); // We lock gamma, never rotating the third axis angle.
           // In vicinity of the antipode (unstable) of q0, restart.
 
-          if (delta[0] < 0.7) dragstarted.apply(this, [event, this]);
-        }
+          if (delta[0] < 0.7) dragstarted.apply(_this, [event]);
+        };
 
         return d3.drag().on('start', dragstarted).on('drag', dragged);
-      }
+      };
 
       canvas.call(drag(projection).on('drag.render', function () {
         onDragSelect();
