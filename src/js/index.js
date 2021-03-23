@@ -179,12 +179,16 @@ class VaccineMap {
    * Remember to use appendSelect!
    */
 
+  _clearTimer() {
+    if (this.globeTimer) {
+      this.globeTimer.stop();
+      this.globeTimer = null;
+    }
+  }
+
   draw() {
     const props = this.props();
-    if (window.globeTimer) {
-      window.globeTimer.stop();
-      window.globeTimer = null;
-    }
+
     const topology = this.geo();
     if (!topology) return this;
 
@@ -454,35 +458,22 @@ class VaccineMap {
       drawMap(false, chosenObj);
     };
 
-    const resetTimer = () => {
-      if (window.globeTimer) {
-        window.globeTimer.stop();
-        window.globeTimer = null;
-      }
-    };
-
-    if (window.globeTimer) {
-      resetTimer();
-      window.globeTimer = d3.interval(loopCountries, props.rotateChange);
-    } else {
+    this._clearTimer();
+    if (!props.stopShow) {
       loopCountries();
-      window.globeTimer = d3.interval(loopCountries, props.rotateChange);
+      this.globeTimer = d3.interval(loopCountries, props.rotateChange);
     }
 
-    if (props.stopShow) {
-      resetTimer();
-    }
-
-    function drag(projection) {
+    const drag = (projection) => {
       let v0, q0, r0, a0, l;
 
-      function pointer(event, that) {
-        const t = d3.pointers(event, that);
+      const pointer = (event) => {
+        const t = d3.pointers(event, canvas.node());
 
         if (t.length !== l) {
           l = t.length;
           if (l > 1) a0 = Math.atan2(t[1][1] - t[0][1], t[1][0] - t[0][0]);
-          dragstarted.apply(that, [event, that]);
+          dragstarted.apply(canvas.node(), [event]);
         }
 
         // For multitouch, average positions and compute rotation.
@@ -494,16 +485,16 @@ class VaccineMap {
         }
 
         return t[0];
-      }
+      };
 
-      function dragstarted(event) {
-        resetTimer();
-        v0 = versor.cartesian(projection.invert(pointer(event, this)));
+      const dragstarted = (event) => {
+        this._clearTimer();
+        v0 = versor.cartesian(projection.invert(pointer(event)));
         q0 = versor((r0 = projection.rotate()));
-      }
+      };
 
-      function dragged(event) {
-        const p = pointer(event, this);
+      const dragged = (event) => {
+        const p = pointer(event);
         const v1 = versor.cartesian(projection.rotate(r0).invert(p));
         const delta = versor.delta(v0, v1);
         let q1 = versor.multiply(q0, delta);
@@ -516,15 +507,15 @@ class VaccineMap {
           q1 = versor.multiply([Math.sqrt(1 - s * s), 0, 0, c * s], q1);
         }
 
-        const [lambda, phi, gamma] = versor.rotation(q1);
+        const [lambda, phi] = versor.rotation(q1);
         projection.rotate([lambda, phi, 0]); // We lock gamma, never rotating the third axis angle.
 
         // In vicinity of the antipode (unstable) of q0, restart.
-        if (delta[0] < 0.7) dragstarted.apply(this, [event, this]);
-      }
+        if (delta[0] < 0.7) dragstarted.apply(this, [event]);
+      };
 
       return d3.drag().on('start', dragstarted).on('drag', dragged);
-    }
+    };
 
     canvas
       .call(
