@@ -289,7 +289,7 @@ class VaccineMap {
         width > props.breakpoint ?
           d3.select('.sentence-container').node().getBoundingClientRect()
             .height +
-              width * 0.12 +
+              width * 0.8 +
               10 :
           5
       )
@@ -383,7 +383,7 @@ class VaccineMap {
         width > props.breakpoint ?
           d3.select('.sentence-container').node().getBoundingClientRect()
             .height +
-              width * 0.12 +
+              width * 0.8 +
               10 :
           selectedCountry.fully ?
             5 :
