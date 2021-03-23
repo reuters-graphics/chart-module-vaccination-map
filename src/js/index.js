@@ -1,13 +1,15 @@
 import 'd3-transition';
 
-import { appendSelect } from 'd3-appendselect';
-import merge from 'lodash/merge';
-import * as topojson from 'topojson-client';
 import * as d3 from 'd3';
-import { geoVoronoi } from 'd3-geo-voronoi';
-import versor from 'versor/src/index.js';
+import * as topojson from 'topojson-client';
+
 import Mustache from 'mustache';
+import { appendSelect } from 'd3-appendselect';
+import { geoVoronoi } from 'd3-geo-voronoi';
+import merge from 'lodash/merge';
 import spin from './spin.js';
+import versor from 'versor/src/index.js';
+
 d3.selection.prototype.appendSelect = appendSelect;
 
 /**
@@ -206,7 +208,7 @@ class VaccineMap {
       .domain(d3.extent(useData, (d) => parseFloat(d[props.variableName])))
       .range([0, 1]);
 
-    filteredCountries.forEach(function (d) {
+    filteredCountries.forEach(function(d) {
       d.val = numberScale(
         parseFloat(
           useData.filter((e) => e.countryISO === d.properties.isoAlpha2)[0][
@@ -284,12 +286,12 @@ class VaccineMap {
       .attr('x2', `${width / 2}`)
       .attr(
         'y1',
-        width > props.breakpoint
-          ? d3.select('.sentence-container').node().getBoundingClientRect()
-              .height +
+        width > props.breakpoint ?
+          d3.select('.sentence-container').node().getBoundingClientRect()
+            .height +
               width * 0.12 +
-              10
-          : 5
+              10 :
+          5
       )
       .attr('y2', `${(width / 2) * 0.735}`);
 
@@ -314,7 +316,7 @@ class VaccineMap {
       this._drawLand();
       this._drawBorders();
       const all = this;
-      filteredCountries.forEach(function (d) {
+      filteredCountries.forEach(function(d) {
         if (d === highlighted) {
           dC(d, all, true);
         } else {
@@ -378,14 +380,14 @@ class VaccineMap {
       rotateToPoint();
       d3.select('line.line.globe-ref-line').attr(
         'y1',
-        width > props.breakpoint
-          ? d3.select('.sentence-container').node().getBoundingClientRect()
-              .height +
+        width > props.breakpoint ?
+          d3.select('.sentence-container').node().getBoundingClientRect()
+            .height +
               width * 0.12 +
-              10
-          : selectedCountry.fully
-          ? 5
-          : 0
+              10 :
+          selectedCountry.fully ?
+            5 :
+            0
       );
     };
     const voronoiShapefile = geoVoronoi().polygons(voronoiCentroids).features;
@@ -480,7 +482,8 @@ class VaccineMap {
           q1 = versor.multiply([Math.sqrt(1 - s * s), 0, 0, c * s], q1);
         }
 
-        projection.rotate(versor.rotation(q1));
+        const [lambda, phi, gamma] = versor.rotation(q1);
+        projection.rotate([lambda, phi, 0]); // We lock gamma, never rotating the third axis angle.
 
         // In vicinity of the antipode (unstable) of q0, restart.
         if (delta[0] < 0.7) dragstarted.apply(this, [event, this]);
@@ -491,7 +494,7 @@ class VaccineMap {
 
     canvas
       .call(
-        drag(projection).on('drag.render', function () {
+        drag(projection).on('drag.render', function() {
           onDragSelect();
         })
       )
