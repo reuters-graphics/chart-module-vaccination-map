@@ -192,6 +192,8 @@ class VaccineMap {
     const topology = this.geo();
     if (!topology) return this;
 
+    this._clearTimer();
+
     const countriesFeatures = props.topology.getCountryFeatures(topology);
     const disputedBoundariesFeatures = props.topology.getDisputedBorderFeatures(
       topology
@@ -458,7 +460,6 @@ class VaccineMap {
       drawMap(false, chosenObj);
     };
 
-    this._clearTimer();
     if (!props.stopShow) {
       loopCountries();
       this.globeTimer = d3.interval(loopCountries, props.rotateChange);
