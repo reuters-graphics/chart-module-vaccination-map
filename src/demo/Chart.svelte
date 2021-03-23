@@ -15,18 +15,15 @@ Follow the notes below! -->
   // 🎚️ Create variables for any data or props you want users to be able
   // to update in the demo. (And write buttons to update them below!)
   let defaultGeo = topo;
-
+  let autoPlay = false;
   // ...
 
   // 🎈 Tie your custom props back together into one chartProps object.
   $: chartProps = {
-    mobile: false,
-    heightRatio: (width, breakpoint) => (width < breakpoint ? 0.5 : 0.4),
+    stopShow: autoPlay,
   };
 
   afterUpdate(() => {
-    // 💪 Create a new chart instance of your module.
-    chart = new VaccineMap();
     // ⚡ And let's use your chart!
     chart
       .selection(chartContainer)
@@ -41,6 +38,16 @@ Follow the notes below! -->
 
 <div class="chart-options">
   <!-- ✏️ Create buttons that update your data/props variables when they're clicked! -->
+  <button
+    on:click={() => {
+      autoPlay = false;
+    }}>Auto Play</button
+  >
+  <button
+    on:click={() => {
+      autoPlay = true;
+    }}>Stop Play</button
+  >
 </div>
 
 <!-- ⚙️ These components will automatically create interactive documentation for you chart! -->

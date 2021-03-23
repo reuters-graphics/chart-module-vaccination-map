@@ -892,10 +892,10 @@
     eslint-plugin-react-hooks "*"
     eslint-plugin-standard "*"
 
-"@reuters-graphics/graphics-atlas-client@^0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@reuters-graphics/graphics-atlas-client/-/graphics-atlas-client-0.5.0.tgz#2137165ff91c83bc29080f307b8344eb5d0f7e4a"
-  integrity sha512-a7MBHA0swgJ+1kpmY3RZLPTkq57KNplXmb5PmXO2LjaZA5zSBJpQc60SsJjRsiJMc8NroAOh7G5uZcYuqMFVFg==
+"@reuters-graphics/graphics-atlas-client@^0.5.2":
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/@reuters-graphics/graphics-atlas-client/-/graphics-atlas-client-0.5.2.tgz#d060b5f0eaad012156d82dad7bf5512d37bffa4a"
+  integrity sha512-c79vMC0+LnqKDVPq1qPYloiT1h1hOnDvZ6zEb22nKE/9OaCHaMRdDUWEf5O3/P45oiMfkfOo9/zV+tqpJIU4Mw==
   dependencies:
     cross-fetch "^3.0.5"
     glob "^7.1.6"
@@ -1460,7 +1460,7 @@ d3-delaunay@5:
   resolved "https://registry.yarnpkg.com/d3-dispatch/-/d3-dispatch-2.0.0.tgz#8a18e16f76dd3fcaef42163c97b926aa9b55e7cf"
   integrity sha512-S/m2VsXI7gAti2pBoLClFFTMOO1HTtT0j99AuXLoGFKO6deHDdnv6ZGTxSTTUTgO1zVcv82fCOtDjYK4EECmWA==
 
-d3-drag@2:
+d3-drag@2, d3-drag@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/d3-drag/-/d3-drag-2.0.0.tgz#9eaf046ce9ed1c25c88661911c1d5a4d8eb7ea6d"
   integrity sha512-g9y9WbMnF5uqB9qKqwIIa/921RYWzlUDv9Jl1/yONQwxbOfszAWTCm8u7HOTgJgRDXiRZN56cHT9pd24dmXs8w==

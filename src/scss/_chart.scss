@@ -2,7 +2,7 @@
 @import '~@reuters-graphics/style-color/scss/thematic/brand';
 
 $VaccineMap-container: '#vaccine-map-container' !default;
-
+$dark-blue: #2f353f;
 #{$VaccineMap-container} {
   .canvas-container {
     position: relative;
@@ -54,19 +54,126 @@ $VaccineMap-container: '#vaccine-map-container' !default;
       display: none;
     }
   }
+  .sentence-container {
+    position: absolute;
+    top: 8%;
+    width: 100%;
+    z-index: 1000;
+    min-height: 90px;
+    vertical-align: bottom;
+    pointer-events: none;
+  }
+
   .sentence {
     font-size: 1.3rem;
     line-height: 1.8rem;
     color: white;
     font-weight: 100;
     text-align: center;
+    max-width: 320px;
+    margin: 0 auto;
+    box-shadow: none;
+    background: rgba(47, 53, 63, 0.5);
+    border-radius: 4px;
+    padding: 4px 8px;
+    &:after {
+      box-shadow: none;
+      background: $dark-blue;
+      border-right: 1.4px solid white;
+      border-top: 1.4px solid white;
+      display: block;
+      content: ' ';
+      width: 8px;
+      height: 8px;
+      border-top-right-radius: 2px;
+      position: absolute;
+      left: 50%;
+      margin-left: -3px;
+      transform: rotate(135deg);
+    }
+    .text {
+      font-size: 1rem;
+      line-height: 1.6rem;
+    }
     .country,
     .percent {
+      font-size: 1.3rem;
       font-weight: 600;
+    }
+
+    .fully-text.hide {
+      display: none;
     }
   }
 
   .line {
     position: absolute;
+  }
+
+  .spin-me {
+    pointer-events: none;
+    position: absolute;
+    margin-left: 10px;
+    margin-top: 10px;
+    text-align: center;
+    svg {
+      width: 25px;
+      margin: 0 auto;
+      transform: rotate(-30deg);
+    }
+    .spin-text {
+      color: rgba(255, 255, 255, 0.5);
+    }
+  }
+
+  .color-scale-group {
+    margin: 0 auto 0 auto;
+    color: rgba(255, 255, 255, 0.5);
+    line-height: 1.1rem;
+    font-size: 0.9rem;
+    text-align: center;
+    .less,
+    .more {
+      display: inline-block;
+      width: 50%;
+    }
+    .less {
+      text-align: left;
+    }
+    .more {
+      text-align: right;
+    }
+  }
+
+  &.mobile {
+    .sentence-container {
+      position: relative;
+      top: 0%;
+      .sentence::after {
+        margin-top: -3px;
+      }
+      .sentence {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        left: 0;
+        right: 0;
+        .country,
+        .percent {
+          font-size: 1.1rem;
+        }
+      }
+    }
+
+    .spin-me {
+      right: 3%;
+      bottom: 5%;
+      margin-left: 0;
+      margin-top: 0;
+    }
+
+    .color-scale-group {
+      max-width: 140px;
+    }
   }
 }

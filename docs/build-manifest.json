@@ -1,7 +1,7 @@
 {
   "inputs": {
     "dist/scss/demo.css": {
-      "bytes": 309967,
+      "bytes": 312240,
       "imports": []
     },
     "dist/demo/App/App.svelte.css": {
@@ -75,6 +75,10 @@
           "kind": "import-statement"
         }
       ]
+    },
+    "dist/demo/Chart.svelte.css": {
+      "bytes": 69,
+      "imports": []
     },
     "_snowpack/pkg/svelte.js": {
       "bytes": 63,
@@ -204,23 +208,6 @@
         }
       ]
     },
-    "_snowpack/pkg/d3-appendselect.js": {
-      "bytes": 2961,
-      "imports": []
-    },
-    "_snowpack/pkg/lodash/merge.js": {
-      "bytes": 58485,
-      "imports": [
-        {
-          "path": "_snowpack/pkg/common/_commonjsHelpers-6d0ad781.js",
-          "kind": "import-statement"
-        }
-      ]
-    },
-    "_snowpack/pkg/topojson-client.js": {
-      "bytes": 14145,
-      "imports": []
-    },
     "_snowpack/pkg/common/delaunay-6cb1bb76.js": {
       "bytes": 37560,
       "imports": []
@@ -246,17 +233,8 @@
         }
       ]
     },
-    "_snowpack/pkg/d3-geo-voronoi.js": {
-      "bytes": 89369,
-      "imports": [
-        {
-          "path": "_snowpack/pkg/common/delaunay-6cb1bb76.js",
-          "kind": "import-statement"
-        }
-      ]
-    },
-    "_snowpack/pkg/versor/src/index.js": {
-      "bytes": 3908,
+    "_snowpack/pkg/topojson-client.js": {
+      "bytes": 14145,
       "imports": []
     },
     "_snowpack/pkg/mustache.js": {
@@ -268,23 +246,41 @@
         }
       ]
     },
+    "_snowpack/pkg/d3-appendselect.js": {
+      "bytes": 2961,
+      "imports": []
+    },
+    "_snowpack/pkg/d3-geo-voronoi.js": {
+      "bytes": 89369,
+      "imports": [
+        {
+          "path": "_snowpack/pkg/common/delaunay-6cb1bb76.js",
+          "kind": "import-statement"
+        }
+      ]
+    },
+    "_snowpack/pkg/lodash/merge.js": {
+      "bytes": 58485,
+      "imports": [
+        {
+          "path": "_snowpack/pkg/common/_commonjsHelpers-6d0ad781.js",
+          "kind": "import-statement"
+        }
+      ]
+    },
+    "dist/js/spin.js": {
+      "bytes": 1258,
+      "imports": []
+    },
+    "_snowpack/pkg/versor/src/index.js": {
+      "bytes": 3908,
+      "imports": []
+    },
     "dist/js/index.js": {
-      "bytes": 15493,
+      "bytes": 16713,
       "imports": [
         {
           "path": "_snowpack/pkg/d3-transition.js",
-          "kind": "import-statement"
-        },
-        {
-          "path": "_snowpack/pkg/d3-appendselect.js",
-          "kind": "import-statement"
-        },
-        {
-          "path": "_snowpack/pkg/lodash/merge.js",
-          "kind": "import-statement"
-        },
-        {
-          "path": "_snowpack/pkg/topojson-client.js",
           "kind": "import-statement"
         },
         {
@@ -292,21 +288,37 @@
           "kind": "import-statement"
         },
         {
-          "path": "_snowpack/pkg/d3-geo-voronoi.js",
-          "kind": "import-statement"
-        },
-        {
-          "path": "_snowpack/pkg/versor/src/index.js",
+          "path": "_snowpack/pkg/topojson-client.js",
           "kind": "import-statement"
         },
         {
           "path": "_snowpack/pkg/mustache.js",
           "kind": "import-statement"
+        },
+        {
+          "path": "_snowpack/pkg/d3-appendselect.js",
+          "kind": "import-statement"
+        },
+        {
+          "path": "_snowpack/pkg/d3-geo-voronoi.js",
+          "kind": "import-statement"
+        },
+        {
+          "path": "_snowpack/pkg/lodash/merge.js",
+          "kind": "import-statement"
+        },
+        {
+          "path": "dist/js/spin.js",
+          "kind": "import-statement"
+        },
+        {
+          "path": "_snowpack/pkg/versor/src/index.js",
+          "kind": "import-statement"
         }
       ]
     },
     "dist/demo/topo.json.proxy.js": {
-      "bytes": 610347,
+      "bytes": 639191,
       "imports": []
     },
     "dist/demo/data.json.proxy.js": {
@@ -314,8 +326,12 @@
       "imports": []
     },
     "dist/demo/Chart.svelte.js": {
-      "bytes": 4118,
+      "bytes": 4721,
       "imports": [
+        {
+          "path": "dist/demo/Chart.svelte.css",
+          "kind": "import-statement"
+        },
         {
           "path": "_snowpack/pkg/svelte/internal.js",
           "kind": "import-statement"
@@ -387,10 +403,10 @@
       "entryPoint": "dist/scss/demo.css",
       "inputs": {
         "dist/scss/demo.css": {
-          "bytesInOutput": 251810
+          "bytesInOutput": 253756
         }
       },
-      "bytes": 251828
+      "bytes": 253774
     },
     "../~~bundle~~/dist/demo/App/index.js": {
       "imports": [],
@@ -425,6 +441,9 @@
         },
         "dist/demo/App/ChartContainer.svelte.js": {
           "bytesInOutput": 2508
+        },
+        "dist/demo/Chart.svelte.css": {
+          "bytesInOutput": 0
         },
         "_snowpack/pkg/svelte.js": {
           "bytesInOutput": 0
@@ -465,41 +484,44 @@
         "_snowpack/pkg/d3-transition.js": {
           "bytesInOutput": 0
         },
-        "_snowpack/pkg/d3-appendselect.js": {
-          "bytesInOutput": 919
-        },
-        "_snowpack/pkg/lodash/merge.js": {
-          "bytesInOutput": 11840
-        },
-        "_snowpack/pkg/topojson-client.js": {
-          "bytesInOutput": 3218
-        },
         "_snowpack/pkg/d3.js": {
           "bytesInOutput": 108915
         },
         "_snowpack/pkg/common/delaunay-6cb1bb76.js": {
           "bytesInOutput": 16340
         },
-        "_snowpack/pkg/d3-geo-voronoi.js": {
-          "bytesInOutput": 42596
-        },
-        "_snowpack/pkg/versor/src/index.js": {
-          "bytesInOutput": 1858
+        "_snowpack/pkg/topojson-client.js": {
+          "bytesInOutput": 3218
         },
         "_snowpack/pkg/mustache.js": {
           "bytesInOutput": 6590
         },
+        "_snowpack/pkg/d3-appendselect.js": {
+          "bytesInOutput": 919
+        },
+        "_snowpack/pkg/d3-geo-voronoi.js": {
+          "bytesInOutput": 42596
+        },
+        "_snowpack/pkg/lodash/merge.js": {
+          "bytesInOutput": 11840
+        },
+        "dist/js/spin.js": {
+          "bytesInOutput": 1234
+        },
+        "_snowpack/pkg/versor/src/index.js": {
+          "bytesInOutput": 1858
+        },
         "dist/js/index.js": {
-          "bytesInOutput": 6497
+          "bytesInOutput": 7875
         },
         "dist/demo/topo.json.proxy.js": {
-          "bytesInOutput": 619319
+          "bytesInOutput": 645547
         },
         "dist/demo/data.json.proxy.js": {
           "bytesInOutput": 32276
         },
         "dist/demo/Chart.svelte.js": {
-          "bytesInOutput": 1179
+          "bytesInOutput": 1389
         },
         "dist/demo/App/App.svelte.js": {
           "bytesInOutput": 905
@@ -508,7 +530,7 @@
           "bytesInOutput": 44
         }
       },
-      "bytes": 2012317
+      "bytes": 2041367
     },
     "../~~bundle~~/dist/demo/App/index.css": {
       "imports": [],
@@ -522,6 +544,9 @@
         "dist/demo/App/Nav.svelte.css": {
           "bytesInOutput": 188
         },
+        "dist/demo/Chart.svelte.css": {
+          "bytesInOutput": 69
+        },
         "dist/demo/App/Docs.svelte.css": {
           "bytesInOutput": 330
         },
@@ -529,7 +554,7 @@
           "bytesInOutput": 226
         }
       },
-      "bytes": 1554
+      "bytes": 1623
     }
   }
 }

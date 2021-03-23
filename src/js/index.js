@@ -1,14 +1,14 @@
 import 'd3-transition';
 
-import { appendSelect } from 'd3-appendselect';
-import merge from 'lodash/merge';
-import * as topojson from 'topojson-client';
 import * as d3 from 'd3';
-import { geoVoronoi } from 'd3-geo-voronoi';
-import versor from 'versor/src/index.js';
+import * as topojson from 'topojson-client';
+
 import Mustache from 'mustache';
-// import * as inertia from 'd3-inertia'
-// import { geoVoronoi } from 'd3-geo-voronoi';
+import { appendSelect } from 'd3-appendselect';
+import { geoVoronoi } from 'd3-geo-voronoi';
+import merge from 'lodash/merge';
+import spin from './spin.js';
+import versor from 'versor/src/index.js';
 
 d3.selection.prototype.appendSelect = appendSelect;
 
@@ -62,13 +62,10 @@ class VaccineMap {
    * functions that can get properties from your data.
    */
   defaultProps = {
-    heightRatio: (width, breakpoint) => (width < breakpoint ? 0.8 : 0.5),
     locale: 'en',
-    getDataRange: (width) => ({ min: 0, max: 1 }),
     borders: {
-      strokeColor: '#fff',
+      strokeColor: '#2f353f',
       strokeWidth: 0.5,
-      strokeOpacity: 0.15,
       disputedBorders: {
         show: false,
         strokeColor: '#2f353f',
@@ -80,34 +77,46 @@ class VaccineMap {
       strokeColor: 'rgba(255, 255, 255, 0.5)',
       strokeWidth: 0.1,
       landFill: 'rgba(153,153,153,0.2)',
-      verticalAxisTilt: 15,
-      colorFill: '#A3BE8C',
-      colorBins: d3.scaleLinear()
-        .interpolate(d3.interpolateHcl)
-        .domain([0, 0.25, 0.5, 0.75, 1])
-        .range([
-          d3.rgb('#505753'), d3.rgb('#6B7165'), d3.rgb('#838B78'), d3.rgb('#9BA987'), d3.rgb('#ACBD93') 
-        ]),
-      fillScale: d3.scaleLinear().domain([0, 1]).range([0.1, 1.05]),
+      verticalAxisTilt: 8,
+      colorFill: '#22BD3B',
+      fillScale: d3.scaleLinear().domain([0, 1]).range([0.05, 1]),
+      linearGradientForKey:
+        'linear-gradient(90deg, rgba(34,189,59,0.05) 0%, rgba(34,189,59,1) 100%)',
       highlight: {
-        strokeColor: 'white',
-        strokeWidth: 1.5,
-        opacity: 0.5,
+        strokeColor: 'rgba(255,255,255,.65)',
+        strokeWidth: 1,
       },
     },
-    interaction: true,
-    variableName: 'perPopulation',
+    variableName: 'vaccinatedPerPopulation',
     spin: false,
-    spinSpeed: 12000,
     spinToSpeed: 750,
     rotateChange: 3500,
+    breakpoint: 600,
+    stopShow: false,
+    spinText: 'Spin me',
+    numberRound: function (d) {
+      const num = d3.format('.1%')(d);
+      if (num === '0.0%') {
+        return '<0.1%';
+      } else {
+        return num.replace('.0', '');
+      }
+    },
     sentence:
-      "<span class='country'> {{ countryName }}</span> has vaccinated atleast <span class='percent'>58%</span> of its population.",
+      "<div class='country'> {{ countryName }}</div> <div class='text'><span class='percent'>{{oneDose}}</span> received at least one dose.</div> <div class='text fully-text'><span class='fully'>{{fully}}</span> have been fully vaccinated.</div>",
     topology: {
       getCountryFeatures: (topology) => topology.objects.countries,
       getDisputedBorderFeatures: (topology) =>
         topology.objects.disputedBoundaries,
       getLandFeatures: (topology) => topology.objects.land,
+    },
+    colorScaleText: '% of people given at least one dose',
+    colorScaleWidth: 250,
+    colorScaleMargin: 5,
+    colorScaleHeight: 8,
+    colorLabel: {
+      lessText: 'Less',
+      moreText: 'More',
     },
   };
 
@@ -123,21 +132,15 @@ class VaccineMap {
   }
 
   _drawLand() {
-    // const { globe } = this.props();
-    // this._context.beginPath();
-    // this._path(this._land);
-    // this._context.fillStyle = globe.landFill;
-    // this._context.fill();
+    const { globe } = this.props();
+    this._context.beginPath();
+    this._path(this._land);
+    this._context.fillStyle = globe.landFill;
+    this._context.fill();
   }
 
   _drawBorders() {
     const { borders } = this.props();
-    this._context.beginPath();
-    this._path(this._countryBorders);
-    this._context.strokeStyle = borders.strokeColor;
-    this._context.globalAlpha = borders.strokeOpacity;
-    this._context.lineWidth = borders.strokeWidth;
-    this._context.stroke();
     if (borders.disputedBorders.show) this._drawDisputedBorders();
   }
 
@@ -155,14 +158,16 @@ class VaccineMap {
 
   _drawCountries(country, all, highlight) {
     const { globe } = all.props();
+
     all._context.beginPath();
-    all._context.globalAlpha = 1;
     all._path(country);
-    all._context.fillStyle = globe.colorBins(country.val);
+    all._context.fillStyle = globe.colorFill;
+    all._context.globalAlpha = globe.fillScale(country.val);
+
     all._context.fill();
 
     if (highlight) {
-      all._context.globalAlpha = globe.highlight.opacity;
+      all._context.globalAlpha = 1;
       all._context.strokeStyle = globe.highlight.strokeColor;
       all._context.lineWidth = globe.highlight.strokeWidth;
       all._context.stroke();
@@ -174,15 +179,20 @@ class VaccineMap {
    * Remember to use appendSelect!
    */
 
-  draw() {
-    if (window.globeTimer) {
-      window.globeTimer.stop();
-      window.globeTimer = null;
+  _clearTimer() {
+    if (this.globeTimer) {
+      this.globeTimer.stop();
+      this.globeTimer = null;
     }
+  }
+
+  draw() {
     const props = this.props();
+
     const topology = this.geo();
     if (!topology) return this;
 
+    this._clearTimer();
 
     const countriesFeatures = props.topology.getCountryFeatures(topology);
     const disputedBoundariesFeatures = props.topology.getDisputedBorderFeatures(
@@ -200,20 +210,23 @@ class VaccineMap {
       sphere
     );
     let useData = this.data();
-    useData.forEach(function (d) {
+
+    for (let i = 0; i < useData.length; i++) {
+      const d = useData[i];
       d.perPopulation = d.totalDoses / d.population;
+      d.vaccinatedPerPopulation = d.peopleVaccinated / d.population;
       d.fullyVaccinatedPerPop = d.peopleFullyVaccinated / d.population;
-    });
+    }
 
     useData = useData.filter((d) => d[props.variableName] > 0);
     const filteredCountryKeys = useData.map((d) => d.countryISO);
     this._disputedBorders = topojson.mesh(topology, disputedBoundariesFeatures);
-    this._countryBorders = topojson.mesh(topology, countriesFeatures);
     this._land = topojson.feature(topology, landFeatures);
     const countries = topojson.feature(topology, countriesFeatures);
     const filteredCountries = countries.features.filter((d) =>
       filteredCountryKeys.includes(d.properties.isoAlpha2)
     );
+
     const numberScale = d3
       .scaleLinear()
       .domain(d3.extent(useData, (d) => parseFloat(d[props.variableName])))
@@ -227,7 +240,13 @@ class VaccineMap {
           ]
         )
       );
-      console.log(d.val);
+
+      d.fully = numberScale(
+        parseFloat(
+          useData.filter((e) => e.countryISO === d.properties.isoAlpha2)[0]
+            .fullyVaccinatedPerPop
+        )
+      );
     });
 
     const filteredCountriesRandom = filteredCountries.filter(
@@ -253,24 +272,47 @@ class VaccineMap {
 
     const voronoiCentroids = countryCentroids;
 
+    const spinMe = this.selection()
+      .appendSelect('div.spin-me')
+      .html(spin + `<div class="spin-text">${props.spinText}</div>`);
+
     const sentence = this.selection()
+      .classed('mobile', width < props.breakpoint)
+      .appendSelect('div.sentence-container')
       .appendSelect('div.sentence')
       .html(
         Mustache.render(props.sentence, {
-          countryName: 'Israel',
-          percent: '58%',
+          countryName: 'Country',
+          oneDose: 'Percent',
+          fully: null,
         })
       );
-
-    sentence
-      .selectAll('.country, .percent')
-      .style('color', props.globe.colorFill)
-      .style('border-bottom', `${props.globe.colorFill} 1px solid`);
 
     const canvasContainer = this.selection()
       .appendSelect('div.canvas-container')
       .style('width', `${width}px`)
       .style('height', `${width}px`);
+
+    const colorScaleDiv = this.selection()
+      .appendSelect('div.color-scale-group')
+      .style('width', props.colorScaleWidth + 'px')
+      .style('left', width / 2 - props.colorScaleWidth / 2 + 'px');
+
+    colorScaleDiv
+      .appendSelect('div.color-scale-text')
+      .text(props.colorScaleText);
+
+    colorScaleDiv
+      .appendSelect('div.color-scale')
+      .style('height', props.colorScaleHeight + 'px')
+      .style('margin', props.colorScaleMargin + 'px 0')
+      .style('background', props.globe.linearGradientForKey);
+
+    const colorLabels = colorScaleDiv.appendSelect('div.color-labels');
+
+    colorLabels.appendSelect('div.less').text(props.colorLabel.lessText);
+
+    colorLabels.appendSelect('div.more').text(props.colorLabel.moreText);
 
     const canvas = canvasContainer
       .appendSelect('canvas')
@@ -279,26 +321,23 @@ class VaccineMap {
       .style('width', `${width}px`)
       .style('height', `${width}px`);
 
-    // const svg = canvasContainer
-    //   .appendSelect('svg.veronoi')
-    //   .attr('width', width)
-    //   .attr('height', width)
-
-    // const countryVoronoiCentroids = svg.appendSelect('g.voronoi')
-    //   .style('fill', 'none')
-    //   .style('pointer-events', 'none')
-    //   .selectAll('path.voronoi')
-    //   .data()
-
     const line = canvasContainer
       .appendSelect('svg')
       .attr('height', width)
       .attr('width', width)
-      .appendSelect('line.line')
+      .appendSelect('line.line.globe-ref-line')
       .style('stroke', props.globe.highlight.strokeColor)
-      .attr('x1', `${width / 2}`)
-      .attr('x2', `${width / 2}`)
-      .attr('y1', `0`)
+      .attr('x1', `${width / 2 + 0.5}`)
+      .attr('x2', `${width / 2 + 0.5}`)
+      .attr(
+        'y1',
+        width > props.breakpoint
+          ? d3.select('.sentence-container').node().getBoundingClientRect()
+              .height +
+              width * 0.08 +
+              10
+          : 5
+      )
       .attr('y2', `${(width / 2) * 0.735}`);
 
     projection.rotate(this._rotation);
@@ -316,47 +355,11 @@ class VaccineMap {
     let destination = [];
     destination = selectedCountry.properties.centroid;
 
-    const geoPath = d3.geoPath(
-      d3
-        .geoOrthographic()
-        .fitExtent(
-          [
-            [10, 10],
-            [width - 10, width - 10],
-          ],
-          sphere
-        )
-        .rotate([
-          -destination[0],
-          props.globe.verticalAxisTilt - destination[1],
-        ]),
-      this._context
-    );
-
-    // countryVoronoiCentroids.enter()
-    //   .append('path')
-    //   .attr('class', d => 'voronoi')
-    //   .merge(countryVoronoiCentroids)
-    //   .attr('d', this._pathCheck)
-    //   .on('mouseover', d => {
-    //     // if (props.interaction) {
-    //     //   tipOn(d);
-    //     // }
-    //   })
-    //   .on('mouseout', d => {
-    //     // if (props.interaction) {
-    //     //   tipOff(d);
-    //     // }
-    //   });
-
-    // countryVoronoiCentroids.exit()
-    //   .remove();
-
     const dC = this._drawCountries;
     const drawMap = (projectedCentroid, highlighted) => {
       this._context.clearRect(0, 0, width, width);
       this._drawLand();
-      
+      this._drawBorders();
       const all = this;
       filteredCountries.forEach(function (d) {
         if (d === highlighted) {
@@ -367,25 +370,32 @@ class VaccineMap {
       });
 
       this._context.globalAlpha = 1;
-      this._drawBorders();
       this._drawSphere();
 
       const p = projection(highlighted.properties.centroid);
+      const difference = highlighted.fully > 0 ? 15 : -10;
 
-      line.attr('x2', `${p[0]}`).attr('y2', `${p[1]}`);
-
-      sentence.select('.country').text(highlighted.properties.name);
-      sentence
-        .select('.percent')
-        .text(
-          parseInt(
-            useData.filter(
-              (d) => d.countryISO === highlighted.properties.isoAlpha2
-            )[0][props.variableName] * 10000
-          ) /
-            100 +
-            '%'
+      line
+        .attr('x2', `${p[0]}`)
+        .attr('y2', `${p[1]}`)
+        .attr(
+          'y1',
+          width > props.breakpoint
+            ? d3.select('.sentence-container').node().getBoundingClientRect()
+                .height +
+                width * 0.08 +
+                difference
+            : 0
         );
+      sentence.select('.country').text(highlighted.properties.name);
+      sentence.select('.percent').text(() => {
+        return props.numberRound(highlighted.val);
+      });
+      sentence
+        .select('.fully-text')
+        .classed('hide', highlighted.fully < 0)
+        .select('.fully')
+        .text(props.numberRound(highlighted.fully));
     };
 
     const rotateToPoint = () => {
@@ -419,6 +429,16 @@ class VaccineMap {
       drawMap(projectedCentroid, selectedCountry);
       this._rotation = projection.rotate();
       rotateToPoint();
+      const difference = selectedCountry.fully > 0 ? 15 : -10;
+      d3.select('line.line.globe-ref-line').attr(
+        'y1',
+        width > props.breakpoint
+          ? d3.select('.sentence-container').node().getBoundingClientRect()
+              .height +
+              width * 0.08 +
+              difference
+          : 0
+      );
     };
     const voronoiShapefile = geoVoronoi().polygons(voronoiCentroids).features;
 
@@ -450,31 +470,21 @@ class VaccineMap {
       drawMap(false, chosenObj);
     };
 
-    const resetTimer = () => {
-      if (window.globeTimer) {
-        window.globeTimer.stop();
-        window.globeTimer = null;
-      }
-    };
-
-    if (window.globeTimer) {
-      resetTimer();
-      window.globeTimer = d3.interval(loopCountries, props.rotateChange);
-    } else {
+    if (!props.stopShow) {
       loopCountries();
-      window.globeTimer = d3.interval(loopCountries, props.rotateChange);
+      this.globeTimer = d3.interval(loopCountries, props.rotateChange);
     }
 
-    function drag(projection) {
+    const drag = (projection) => {
       let v0, q0, r0, a0, l;
 
-      function pointer(event, that) {
-        const t = d3.pointers(event, that);
+      const pointer = (event) => {
+        const t = d3.pointers(event, canvas.node());
 
         if (t.length !== l) {
           l = t.length;
           if (l > 1) a0 = Math.atan2(t[1][1] - t[0][1], t[1][0] - t[0][0]);
-          dragstarted.apply(that, [event, that]);
+          dragstarted.apply(canvas.node(), [event]);
         }
 
         // For multitouch, average positions and compute rotation.
@@ -486,16 +496,16 @@ class VaccineMap {
         }
 
         return t[0];
-      }
+      };
 
-      function dragstarted(event) {
-        resetTimer();
-        v0 = versor.cartesian(projection.invert(pointer(event, this)));
+      const dragstarted = (event) => {
+        this._clearTimer();
+        v0 = versor.cartesian(projection.invert(pointer(event)));
         q0 = versor((r0 = projection.rotate()));
-      }
+      };
 
-      function dragged(event) {
-        const p = pointer(event, this);
+      const dragged = (event) => {
+        const p = pointer(event);
         const v1 = versor.cartesian(projection.rotate(r0).invert(p));
         const delta = versor.delta(v0, v1);
         let q1 = versor.multiply(q0, delta);
@@ -508,14 +518,15 @@ class VaccineMap {
           q1 = versor.multiply([Math.sqrt(1 - s * s), 0, 0, c * s], q1);
         }
 
-        projection.rotate(versor.rotation(q1));
+        const [lambda, phi] = versor.rotation(q1);
+        projection.rotate([lambda, phi, 0]); // We lock gamma, never rotating the third axis angle.
 
         // In vicinity of the antipode (unstable) of q0, restart.
-        if (delta[0] < 0.7) dragstarted.apply(this, [event, this]);
-      }
+        if (delta[0] < 0.7) dragstarted.apply(this, [event]);
+      };
 
       return d3.drag().on('start', dragstarted).on('drag', dragged);
-    }
+    };
 
     canvas
       .call(
