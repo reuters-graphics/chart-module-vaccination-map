@@ -1,17 +1,17 @@
 'use strict';
 
 var d3Selection = require('d3-selection');
-var d3Appendselect = require('d3-appendselect');
-var merge = require('lodash/merge');
-var topojson = require('topojson-client');
 var d3 = require('d3');
-var d3GeoVoronoi = require('d3-geo-voronoi');
+var topojson = require('topojson-client');
 var Mustache = require('mustache');
+var d3Appendselect = require('d3-appendselect');
+var d3GeoVoronoi = require('d3-geo-voronoi');
+var merge = require('lodash/merge');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
-var merge__default = /*#__PURE__*/_interopDefaultLegacy(merge);
 var Mustache__default = /*#__PURE__*/_interopDefaultLegacy(Mustache);
+var merge__default = /*#__PURE__*/_interopDefaultLegacy(merge);
 
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -48,6 +48,62 @@ function _defineProperty(obj, key, value) {
   }
 
   return obj;
+}
+
+function _slicedToArray(arr, i) {
+  return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
+}
+
+function _arrayWithHoles(arr) {
+  if (Array.isArray(arr)) return arr;
+}
+
+function _iterableToArrayLimit(arr, i) {
+  if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return;
+  var _arr = [];
+  var _n = true;
+  var _d = false;
+  var _e = undefined;
+
+  try {
+    for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+      _arr.push(_s.value);
+
+      if (i && _arr.length === i) break;
+    }
+  } catch (err) {
+    _d = true;
+    _e = err;
+  } finally {
+    try {
+      if (!_n && _i["return"] != null) _i["return"]();
+    } finally {
+      if (_d) throw _e;
+    }
+  }
+
+  return _arr;
+}
+
+function _unsupportedIterableToArray(o, minLen) {
+  if (!o) return;
+  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+  var n = Object.prototype.toString.call(o).slice(8, -1);
+  if (n === "Object" && o.constructor) n = o.constructor.name;
+  if (n === "Map" || n === "Set") return Array.from(o);
+  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+}
+
+function _arrayLikeToArray(arr, len) {
+  if (len == null || len > arr.length) len = arr.length;
+
+  for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
+
+  return arr2;
+}
+
+function _nonIterableRest() {
+  throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 
 var noop = {value: () => {}};
@@ -1721,6 +1777,8 @@ function selection_transition(name) {
 d3Selection.selection.prototype.interrupt = selection_interrupt;
 d3Selection.selection.prototype.transition = selection_transition;
 
+var spin = '<?xml version="1.0" encoding="utf-8"?><svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 18 18" style="enable-background:new 0 0 18 18;" xml:space="preserve"><style type="text/css">  .st0{fill:none;}  #Path_28, #Path_29{    fill: rgba(255,255,255,.75)  }</style><g>  <rect class="st0" width="18" height="18"/></g><g id="Group_97" transform="translate(-1.8 -0.9)">  <path id="Path_28" d="M10.8,3.3c1.7,0,3.3,0.5,4.6,1.6h-1c-0.4,0-0.7,0.3-0.7,0.7c0,0.4,0.3,0.7,0.7,0.7H18V2.7    c0-0.4-0.3-0.6-0.7-0.6c-0.3,0-0.6,0.3-0.6,0.6V4C13.3,1.1,8.3,1.1,4.9,4V2.7c0-0.4-0.3-0.6-0.7-0.6c-0.3,0-0.6,0.3-0.6,0.6v3.6    h3.6c0.4,0,0.7-0.3,0.7-0.7c0-0.4-0.3-0.7-0.7-0.7h-1C7.5,3.9,9.1,3.3,10.8,3.3z"/>  <path id="Path_29" d="M18,11.1v2.7l-0.8,3.4c-0.1,0.5-0.5,0.8-1,0.8h-5.4c-0.3,0-0.6-0.2-0.8-0.4L6.7,13c-0.3-0.4-0.2-1,0.2-1.4    c0.4-0.3,1-0.2,1.4,0.2l0.9,1.1v-7c0-0.5,0.4-1,1-1c0.5,0,0.9,0.5,1,1v5.1h0.2v-1c0-0.5,0.4-1,1-1c0.5,0,1,0.4,1,1v1h0.2v-0.7    c0-0.5,0.4-1,1-1c0.5,0,0.9,0.5,1,1v0.7h0.2c0-0.5,0.4-1,1-1C17.1,10.1,18,10.5,18,11.1z M11.2,12.6H11V15h0.2L11.2,12.6z     M13.4,12.6h-0.2V15h0.2V12.6z M15.4,12.6h-0.2V15h0.2V12.6z"/></g></svg>';
+
 var acos = Math.acos,
     asin = Math.asin,
     atan2 = Math.atan2,
@@ -1844,8 +1902,6 @@ versor.delta = function(v0, v1, alpha) {
   var t = alpha * acos(max(-1, min(1, dot(v0, v1)))) / 2, s = sin(t); // t = θ / 2
   return [cos(t), w[2] / l * s, -w[1] / l * s, w[0] / l * s];
 };
-
-var spin = '<?xml version="1.0" encoding="utf-8"?><svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 18 18" style="enable-background:new 0 0 18 18;" xml:space="preserve"><style type="text/css">  .st0{fill:none;}  #Path_28, #Path_29{    fill: rgba(255,255,255,.75)  }</style><g>  <rect class="st0" width="18" height="18"/></g><g id="Group_97" transform="translate(-1.8 -0.9)">  <path id="Path_28" d="M10.8,3.3c1.7,0,3.3,0.5,4.6,1.6h-1c-0.4,0-0.7,0.3-0.7,0.7c0,0.4,0.3,0.7,0.7,0.7H18V2.7    c0-0.4-0.3-0.6-0.7-0.6c-0.3,0-0.6,0.3-0.6,0.6V4C13.3,1.1,8.3,1.1,4.9,4V2.7c0-0.4-0.3-0.6-0.7-0.6c-0.3,0-0.6,0.3-0.6,0.6v3.6    h3.6c0.4,0,0.7-0.3,0.7-0.7c0-0.4-0.3-0.7-0.7-0.7h-1C7.5,3.9,9.1,3.3,10.8,3.3z"/>  <path id="Path_29" d="M18,11.1v2.7l-0.8,3.4c-0.1,0.5-0.5,0.8-1,0.8h-5.4c-0.3,0-0.6-0.2-0.8-0.4L6.7,13c-0.3-0.4-0.2-1,0.2-1.4    c0.4-0.3,1-0.2,1.4,0.2l0.9,1.1v-7c0-0.5,0.4-1,1-1c0.5,0,0.9,0.5,1,1v5.1h0.2v-1c0-0.5,0.4-1,1-1c0.5,0,1,0.4,1,1v1h0.2v-0.7    c0-0.5,0.4-1,1-1c0.5,0,0.9,0.5,1,1v0.7h0.2c0-0.5,0.4-1,1-1C17.1,10.1,18,10.5,18,11.1z M11.2,12.6H11V15h0.2L11.2,12.6z     M13.4,12.6h-0.2V15h0.2V12.6z M15.4,12.6h-0.2V15h0.2V12.6z"/></g></svg>';
 
 d3.selection.prototype.appendSelect = d3Appendselect.appendSelect;
 /**
@@ -2130,7 +2186,7 @@ var VaccineMap = /*#__PURE__*/function () {
       }));
       var canvasContainer = this.selection().appendSelect('div.canvas-container').style('width', "".concat(width, "px")).style('height', "".concat(width, "px"));
       var canvas = canvasContainer.appendSelect('canvas').attr('width', width * 2).attr('height', width * 2).style('width', "".concat(width, "px")).style('height', "".concat(width, "px"));
-      var line = canvasContainer.appendSelect('svg').attr('height', width).attr('width', width).appendSelect('line.line.globe-ref-line').style('stroke', props.globe.highlight.strokeColor).attr('x1', "".concat(width / 2)).attr('x2', "".concat(width / 2)).attr('y1', width > props.breakpoint ? d3.select('.sentence-container').node().getBoundingClientRect().height + width * 0.12 + 10 : 5).attr('y2', "".concat(width / 2 * 0.735));
+      var line = canvasContainer.appendSelect('svg').attr('height', width).attr('width', width).appendSelect('line.line.globe-ref-line').style('stroke', props.globe.highlight.strokeColor).attr('x1', "".concat(width / 2)).attr('x2', "".concat(width / 2)).attr('y1', width > props.breakpoint ? d3.select('.sentence-container').node().getBoundingClientRect().height + width * 0.8 + 10 : 5).attr('y2', "".concat(width / 2 * 0.735));
       projection.rotate(this._rotation);
       this._context = canvas.node().getContext('2d');
 
@@ -2200,7 +2256,7 @@ var VaccineMap = /*#__PURE__*/function () {
         drawMap(projectedCentroid, selectedCountry);
         _this._rotation = projection.rotate();
         rotateToPoint();
-        d3.select('line.line.globe-ref-line').attr('y1', width > props.breakpoint ? d3.select('.sentence-container').node().getBoundingClientRect().height + width * 0.12 + 10 : selectedCountry.fully ? 5 : 0);
+        d3.select('line.line.globe-ref-line').attr('y1', width > props.breakpoint ? d3.select('.sentence-container').node().getBoundingClientRect().height + width * 0.8 + 10 : selectedCountry.fully ? 5 : 0);
       };
 
       var voronoiShapefile = d3GeoVoronoi.geoVoronoi().polygons(voronoiCentroids).features;
@@ -2299,7 +2355,14 @@ var VaccineMap = /*#__PURE__*/function () {
             q1 = versor.multiply([Math.sqrt(1 - s * s), 0, 0, c * s], q1);
           }
 
-          projection.rotate(versor.rotation(q1)); // In vicinity of the antipode (unstable) of q0, restart.
+          var _versor$rotation = versor.rotation(q1),
+              _versor$rotation2 = _slicedToArray(_versor$rotation, 3),
+              lambda = _versor$rotation2[0],
+              phi = _versor$rotation2[1];
+              _versor$rotation2[2];
+
+          projection.rotate([lambda, phi, 0]); // We lock gamma, never rotating the third axis angle.
+          // In vicinity of the antipode (unstable) of q0, restart.
 
           if (delta[0] < 0.7) dragstarted.apply(this, [event, this]);
         }

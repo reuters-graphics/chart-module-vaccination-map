@@ -80,6 +80,7 @@ class VaccineMap {
       verticalAxisTilt: 8,
       colorFill: '#22BD3B',
       fillScale: d3.scaleLinear().domain([0, 1]).range([0.05, 1]),
+      linearGradientForKey: 'linear-gradient(90deg, rgba(34,189,59,0.05) 0%, rgba(34,189,59,1) 100%)',
       highlight: {
         strokeColor: 'rgba(255,255,255,.65)',
         strokeWidth: 1,
@@ -92,6 +93,7 @@ class VaccineMap {
     breakpoint: 600,
     stopShow: false,
     spinText: 'Spin me',
+    numberRound: d3.format('.1%'),
     sentence:
       "<div class='country'> {{ countryName }}</div> <div class='text'><span class='percent'>{{oneDose}}</span> received at least one dose.</div> <div class='text fully-text'><span class='fully'>{{fully}}</span> have been fully vaccinated.</div>",
     topology: {
@@ -100,6 +102,14 @@ class VaccineMap {
         topology.objects.disputedBoundaries,
       getLandFeatures: (topology) => topology.objects.land,
     },
+    colorScaleText: '% of people receiving at least one dose',
+    colorScaleWidth: 250,
+    colorScaleMargin: 5,
+    colorScaleHeight: 8,
+    colorLabel: {
+      lessText: 'Less',
+      moreText: 'More'
+    }
   };
 
   _rotation = [0, 0];
@@ -208,7 +218,7 @@ class VaccineMap {
       .domain(d3.extent(useData, (d) => parseFloat(d[props.variableName])))
       .range([0, 1]);
 
-    filteredCountries.forEach(function(d) {
+    filteredCountries.forEach(function (d) {
       d.val = numberScale(
         parseFloat(
           useData.filter((e) => e.countryISO === d.properties.isoAlpha2)[0][
@@ -269,6 +279,28 @@ class VaccineMap {
       .style('width', `${width}px`)
       .style('height', `${width}px`);
 
+    const colorScaleDiv = this.selection()
+      .appendSelect('div.color-scale-group')
+      .style('width', props.colorScaleWidth+'px')
+      .style('left', ((width/2) - (props.colorScaleWidth / 2)) + 'px');
+
+    colorScaleDiv.appendSelect('div.color-scale-text')
+      .text(props.colorScaleText)
+
+    colorScaleDiv.appendSelect('div.color-scale')
+      .style('height', props.colorScaleHeight + 'px')
+      .style('margin', props.colorScaleMargin + 'px 0')
+      .style('background', props.globe.linearGradientForKey);
+
+    const colorLabels = colorScaleDiv.appendSelect('div.color-labels')
+
+    colorLabels.appendSelect('div.less')
+      .text(props.colorLabel.lessText)
+
+    colorLabels.appendSelect('div.more')
+      .text(props.colorLabel.moreText)
+
+
     const canvas = canvasContainer
       .appendSelect('canvas')
       .attr('width', width * 2)
@@ -286,12 +318,12 @@ class VaccineMap {
       .attr('x2', `${width / 2}`)
       .attr(
         'y1',
-        width > props.breakpoint ?
-          d3.select('.sentence-container').node().getBoundingClientRect()
-            .height +
-              width * 0.8 +
-              10 :
-          5
+        width > props.breakpoint
+          ? d3.select('.sentence-container').node().getBoundingClientRect()
+              .height +
+              width * 0.08 +
+              10
+          : 5
       )
       .attr('y2', `${(width / 2) * 0.735}`);
 
@@ -316,7 +348,7 @@ class VaccineMap {
       this._drawLand();
       this._drawBorders();
       const all = this;
-      filteredCountries.forEach(function(d) {
+      filteredCountries.forEach(function (d) {
         if (d === highlighted) {
           dC(d, all, true);
         } else {
@@ -333,7 +365,7 @@ class VaccineMap {
 
       sentence.select('.country').text(highlighted.properties.name);
       sentence.select('.percent').text(() => {
-        const text = parseInt(highlighted.val * 10000) / 100 + '%';
+        const text = props.numberRound(highlighted.val);
         if (highlighted.val < 0.001) {
           return '<0.1%';
         } else {
@@ -344,7 +376,7 @@ class VaccineMap {
         .select('.fully-text')
         .classed('hide', highlighted.fully < 0)
         .select('.fully')
-        .text(parseInt(highlighted.fully * 10000) / 100 + '%');
+        .text(props.numberRound(highlighted.fully));
     };
 
     const rotateToPoint = () => {
@@ -380,14 +412,14 @@ class VaccineMap {
       rotateToPoint();
       d3.select('line.line.globe-ref-line').attr(
         'y1',
-        width > props.breakpoint ?
-          d3.select('.sentence-container').node().getBoundingClientRect()
-            .height +
-              width * 0.8 +
-              10 :
-          selectedCountry.fully ?
-            5 :
-            0
+        width > props.breakpoint
+          ? d3.select('.sentence-container').node().getBoundingClientRect()
+              .height +
+              width * 0.08 +
+              10
+          : selectedCountry.fully
+          ? 5
+          : 0
       );
     };
     const voronoiShapefile = geoVoronoi().polygons(voronoiCentroids).features;
@@ -494,7 +526,7 @@ class VaccineMap {
 
     canvas
       .call(
-        drag(projection).on('drag.render', function() {
+        drag(projection).on('drag.render', function () {
           onDragSelect();
         })
       )

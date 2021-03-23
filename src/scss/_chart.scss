@@ -122,7 +122,25 @@ $dark-blue: #2f353f;
       transform: rotate(-30deg);
     }
     .spin-text {
-      color: rgba(255, 255, 255, 0.75);
+      color: rgba(255, 255, 255, 0.5);
+    }
+  }
+
+  .color-scale-group{
+    margin: 0 auto 0 auto;
+    color: rgba(255,255,255,.5);
+    line-height: 1.1rem;
+    font-size: .9rem;
+    text-align: center;
+    .less, .more{
+      display: inline-block;
+      width: 50%;
+    }
+    .less{
+      text-align: left
+    }
+    .more{
+      text-align: right
     }
   }
 
@@ -146,6 +164,10 @@ $dark-blue: #2f353f;
       bottom: 5%;
       margin-left: 0;
       margin-top: 0;
+    }
+
+    .color-scale-group{
+      max-width: 140px
     }
   }
 }
