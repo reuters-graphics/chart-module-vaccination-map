@@ -454,7 +454,7 @@ class VaccineMap {
       };
 
       const dragstarted = (event) => {
-        this.clearTimer();
+        this._clearTimer();
         v0 = versor.cartesian(projection.invert(pointer(event)));
         q0 = versor((r0 = projection.rotate()));
       };
