@@ -80,7 +80,8 @@ class VaccineMap {
       verticalAxisTilt: 8,
       colorFill: '#22BD3B',
       fillScale: d3.scaleLinear().domain([0, 1]).range([0.05, 1]),
-      linearGradientForKey: 'linear-gradient(90deg, rgba(34,189,59,0.05) 0%, rgba(34,189,59,1) 100%)',
+      linearGradientForKey:
+        'linear-gradient(90deg, rgba(34,189,59,0.05) 0%, rgba(34,189,59,1) 100%)',
       highlight: {
         strokeColor: 'rgba(255,255,255,.65)',
         strokeWidth: 1,
@@ -93,7 +94,14 @@ class VaccineMap {
     breakpoint: 600,
     stopShow: false,
     spinText: 'Spin me',
-    numberRound: d3.format('.1%'),
+    numberRound: function (d) {
+      const num = d3.format('.1%')(d);
+      if (num === '0.0%') {
+        return '<0.1%';
+      } else {
+        return num.replace('.0', '');
+      }
+    },
     sentence:
       "<div class='country'> {{ countryName }}</div> <div class='text'><span class='percent'>{{oneDose}}</span> received at least one dose.</div> <div class='text fully-text'><span class='fully'>{{fully}}</span> have been fully vaccinated.</div>",
     topology: {
@@ -108,8 +116,8 @@ class VaccineMap {
     colorScaleHeight: 8,
     colorLabel: {
       lessText: 'Less',
-      moreText: 'More'
-    }
+      moreText: 'More',
+    },
   };
 
   _rotation = [0, 0];
@@ -281,25 +289,24 @@ class VaccineMap {
 
     const colorScaleDiv = this.selection()
       .appendSelect('div.color-scale-group')
-      .style('width', props.colorScaleWidth+'px')
-      .style('left', ((width/2) - (props.colorScaleWidth / 2)) + 'px');
+      .style('width', props.colorScaleWidth + 'px')
+      .style('left', width / 2 - props.colorScaleWidth / 2 + 'px');
 
-    colorScaleDiv.appendSelect('div.color-scale-text')
-      .text(props.colorScaleText)
+    colorScaleDiv
+      .appendSelect('div.color-scale-text')
+      .text(props.colorScaleText);
 
-    colorScaleDiv.appendSelect('div.color-scale')
+    colorScaleDiv
+      .appendSelect('div.color-scale')
       .style('height', props.colorScaleHeight + 'px')
       .style('margin', props.colorScaleMargin + 'px 0')
       .style('background', props.globe.linearGradientForKey);
 
-    const colorLabels = colorScaleDiv.appendSelect('div.color-labels')
+    const colorLabels = colorScaleDiv.appendSelect('div.color-labels');
 
-    colorLabels.appendSelect('div.less')
-      .text(props.colorLabel.lessText)
+    colorLabels.appendSelect('div.less').text(props.colorLabel.lessText);
 
-    colorLabels.appendSelect('div.more')
-      .text(props.colorLabel.moreText)
-
+    colorLabels.appendSelect('div.more').text(props.colorLabel.moreText);
 
     const canvas = canvasContainer
       .appendSelect('canvas')
@@ -365,12 +372,7 @@ class VaccineMap {
 
       sentence.select('.country').text(highlighted.properties.name);
       sentence.select('.percent').text(() => {
-        const text = props.numberRound(highlighted.val);
-        if (highlighted.val < 0.001) {
-          return '<0.1%';
-        } else {
-          return text;
-        }
+        return props.numberRound(highlighted.val);
       });
       sentence
         .select('.fully-text')

@@ -1777,7 +1777,7 @@ function selection_transition(name) {
 d3Selection.selection.prototype.interrupt = selection_interrupt;
 d3Selection.selection.prototype.transition = selection_transition;
 
-var spin = '<?xml version="1.0" encoding="utf-8"?><svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 18 18" style="enable-background:new 0 0 18 18;" xml:space="preserve"><style type="text/css">  .st0{fill:none;}  #Path_28, #Path_29{    fill: rgba(255,255,255,.75)  }</style><g>  <rect class="st0" width="18" height="18"/></g><g id="Group_97" transform="translate(-1.8 -0.9)">  <path id="Path_28" d="M10.8,3.3c1.7,0,3.3,0.5,4.6,1.6h-1c-0.4,0-0.7,0.3-0.7,0.7c0,0.4,0.3,0.7,0.7,0.7H18V2.7    c0-0.4-0.3-0.6-0.7-0.6c-0.3,0-0.6,0.3-0.6,0.6V4C13.3,1.1,8.3,1.1,4.9,4V2.7c0-0.4-0.3-0.6-0.7-0.6c-0.3,0-0.6,0.3-0.6,0.6v3.6    h3.6c0.4,0,0.7-0.3,0.7-0.7c0-0.4-0.3-0.7-0.7-0.7h-1C7.5,3.9,9.1,3.3,10.8,3.3z"/>  <path id="Path_29" d="M18,11.1v2.7l-0.8,3.4c-0.1,0.5-0.5,0.8-1,0.8h-5.4c-0.3,0-0.6-0.2-0.8-0.4L6.7,13c-0.3-0.4-0.2-1,0.2-1.4    c0.4-0.3,1-0.2,1.4,0.2l0.9,1.1v-7c0-0.5,0.4-1,1-1c0.5,0,0.9,0.5,1,1v5.1h0.2v-1c0-0.5,0.4-1,1-1c0.5,0,1,0.4,1,1v1h0.2v-0.7    c0-0.5,0.4-1,1-1c0.5,0,0.9,0.5,1,1v0.7h0.2c0-0.5,0.4-1,1-1C17.1,10.1,18,10.5,18,11.1z M11.2,12.6H11V15h0.2L11.2,12.6z     M13.4,12.6h-0.2V15h0.2V12.6z M15.4,12.6h-0.2V15h0.2V12.6z"/></g></svg>';
+var spin = '<?xml version="1.0" encoding="utf-8"?><svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 18 18" style="enable-background:new 0 0 18 18;" xml:space="preserve"><style type="text/css">  .st0{fill:none;}  #Path_28, #Path_29{    fill: rgba(255,255,255,.5)  }</style><g>  <rect class="st0" width="18" height="18"/></g><g id="Group_97" transform="translate(-1.8 -0.9)">  <path id="Path_28" d="M10.8,3.3c1.7,0,3.3,0.5,4.6,1.6h-1c-0.4,0-0.7,0.3-0.7,0.7c0,0.4,0.3,0.7,0.7,0.7H18V2.7    c0-0.4-0.3-0.6-0.7-0.6c-0.3,0-0.6,0.3-0.6,0.6V4C13.3,1.1,8.3,1.1,4.9,4V2.7c0-0.4-0.3-0.6-0.7-0.6c-0.3,0-0.6,0.3-0.6,0.6v3.6    h3.6c0.4,0,0.7-0.3,0.7-0.7c0-0.4-0.3-0.7-0.7-0.7h-1C7.5,3.9,9.1,3.3,10.8,3.3z"/>  <path id="Path_29" d="M18,11.1v2.7l-0.8,3.4c-0.1,0.5-0.5,0.8-1,0.8h-5.4c-0.3,0-0.6-0.2-0.8-0.4L6.7,13c-0.3-0.4-0.2-1,0.2-1.4    c0.4-0.3,1-0.2,1.4,0.2l0.9,1.1v-7c0-0.5,0.4-1,1-1c0.5,0,0.9,0.5,1,1v5.1h0.2v-1c0-0.5,0.4-1,1-1c0.5,0,1,0.4,1,1v1h0.2v-0.7    c0-0.5,0.4-1,1-1c0.5,0,0.9,0.5,1,1v0.7h0.2c0-0.5,0.4-1,1-1C17.1,10.1,18,10.5,18,11.1z M11.2,12.6H11V15h0.2L11.2,12.6z     M13.4,12.6h-0.2V15h0.2V12.6z M15.4,12.6h-0.2V15h0.2V12.6z"/></g></svg>';
 
 var acos = Math.acos,
     asin = Math.asin,
@@ -1951,6 +1951,7 @@ var VaccineMap = /*#__PURE__*/function () {
         verticalAxisTilt: 8,
         colorFill: '#22BD3B',
         fillScale: d3.scaleLinear().domain([0, 1]).range([0.05, 1]),
+        linearGradientForKey: 'linear-gradient(90deg, rgba(34,189,59,0.05) 0%, rgba(34,189,59,1) 100%)',
         highlight: {
           strokeColor: 'rgba(255,255,255,.65)',
           strokeWidth: 1
@@ -1963,6 +1964,15 @@ var VaccineMap = /*#__PURE__*/function () {
       breakpoint: 600,
       stopShow: false,
       spinText: 'Spin me',
+      numberRound: function numberRound(d) {
+        var num = d3.format('.1%')(d);
+
+        if (num === '0.0%') {
+          return '<0.1%';
+        } else {
+          return num.replace('.0', '');
+        }
+      },
       sentence: "<div class='country'> {{ countryName }}</div> <div class='text'><span class='percent'>{{oneDose}}</span> received at least one dose.</div> <div class='text fully-text'><span class='fully'>{{fully}}</span> have been fully vaccinated.</div>",
       topology: {
         getCountryFeatures: function getCountryFeatures(topology) {
@@ -1974,6 +1984,14 @@ var VaccineMap = /*#__PURE__*/function () {
         getLandFeatures: function getLandFeatures(topology) {
           return topology.objects.land;
         }
+      },
+      colorScaleText: '% of people receiving at least one dose',
+      colorScaleWidth: 250,
+      colorScaleMargin: 5,
+      colorScaleHeight: 8,
+      colorLabel: {
+        lessText: 'Less',
+        moreText: 'More'
       }
     });
 
@@ -2185,8 +2203,14 @@ var VaccineMap = /*#__PURE__*/function () {
         fully: null
       }));
       var canvasContainer = this.selection().appendSelect('div.canvas-container').style('width', "".concat(width, "px")).style('height', "".concat(width, "px"));
+      var colorScaleDiv = this.selection().appendSelect('div.color-scale-group').style('width', props.colorScaleWidth + 'px').style('left', width / 2 - props.colorScaleWidth / 2 + 'px');
+      colorScaleDiv.appendSelect('div.color-scale-text').text(props.colorScaleText);
+      colorScaleDiv.appendSelect('div.color-scale').style('height', props.colorScaleHeight + 'px').style('margin', props.colorScaleMargin + 'px 0').style('background', props.globe.linearGradientForKey);
+      var colorLabels = colorScaleDiv.appendSelect('div.color-labels');
+      colorLabels.appendSelect('div.less').text(props.colorLabel.lessText);
+      colorLabels.appendSelect('div.more').text(props.colorLabel.moreText);
       var canvas = canvasContainer.appendSelect('canvas').attr('width', width * 2).attr('height', width * 2).style('width', "".concat(width, "px")).style('height', "".concat(width, "px"));
-      var line = canvasContainer.appendSelect('svg').attr('height', width).attr('width', width).appendSelect('line.line.globe-ref-line').style('stroke', props.globe.highlight.strokeColor).attr('x1', "".concat(width / 2)).attr('x2', "".concat(width / 2)).attr('y1', width > props.breakpoint ? d3.select('.sentence-container').node().getBoundingClientRect().height + width * 0.8 + 10 : 5).attr('y2', "".concat(width / 2 * 0.735));
+      var line = canvasContainer.appendSelect('svg').attr('height', width).attr('width', width).appendSelect('line.line.globe-ref-line').style('stroke', props.globe.highlight.strokeColor).attr('x1', "".concat(width / 2)).attr('x2', "".concat(width / 2)).attr('y1', width > props.breakpoint ? d3.select('.sentence-container').node().getBoundingClientRect().height + width * 0.08 + 10 : 5).attr('y2', "".concat(width / 2 * 0.735));
       projection.rotate(this._rotation);
       this._context = canvas.node().getContext('2d');
 
@@ -2222,15 +2246,9 @@ var VaccineMap = /*#__PURE__*/function () {
         line.attr('x2', "".concat(p[0])).attr('y2', "".concat(p[1]));
         sentence.select('.country').text(highlighted.properties.name);
         sentence.select('.percent').text(function () {
-          var text = parseInt(highlighted.val * 10000) / 100 + '%';
-
-          if (highlighted.val < 0.001) {
-            return '<0.1%';
-          } else {
-            return text;
-          }
+          return props.numberRound(highlighted.val);
         });
-        sentence.select('.fully-text').classed('hide', highlighted.fully < 0).select('.fully').text(parseInt(highlighted.fully * 10000) / 100 + '%');
+        sentence.select('.fully-text').classed('hide', highlighted.fully < 0).select('.fully').text(props.numberRound(highlighted.fully));
       };
 
       var rotateToPoint = function rotateToPoint() {
@@ -2256,7 +2274,7 @@ var VaccineMap = /*#__PURE__*/function () {
         drawMap(projectedCentroid, selectedCountry);
         _this._rotation = projection.rotate();
         rotateToPoint();
-        d3.select('line.line.globe-ref-line').attr('y1', width > props.breakpoint ? d3.select('.sentence-container').node().getBoundingClientRect().height + width * 0.8 + 10 : selectedCountry.fully ? 5 : 0);
+        d3.select('line.line.globe-ref-line').attr('y1', width > props.breakpoint ? d3.select('.sentence-container').node().getBoundingClientRect().height + width * 0.08 + 10 : selectedCountry.fully ? 5 : 0);
       };
 
       var voronoiShapefile = d3GeoVoronoi.geoVoronoi().polygons(voronoiCentroids).features;

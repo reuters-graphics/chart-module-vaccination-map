@@ -126,21 +126,22 @@ $dark-blue: #2f353f;
     }
   }
 
-  .color-scale-group{
+  .color-scale-group {
     margin: 0 auto 0 auto;
-    color: rgba(255,255,255,.5);
+    color: rgba(255, 255, 255, 0.5);
     line-height: 1.1rem;
-    font-size: .9rem;
+    font-size: 0.9rem;
     text-align: center;
-    .less, .more{
+    .less,
+    .more {
       display: inline-block;
       width: 50%;
     }
-    .less{
-      text-align: left
+    .less {
+      text-align: left;
     }
-    .more{
-      text-align: right
+    .more {
+      text-align: right;
     }
   }
 
@@ -166,8 +167,8 @@ $dark-blue: #2f353f;
       margin-top: 0;
     }
 
-    .color-scale-group{
-      max-width: 140px
+    .color-scale-group {
+      max-width: 140px;
     }
   }
 }
