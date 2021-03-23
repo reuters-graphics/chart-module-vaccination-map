@@ -24,8 +24,6 @@ Follow the notes below! -->
   };
 
   afterUpdate(() => {
-    // 💪 Create a new chart instance of your module.
-    chart = new VaccineMap();
     // ⚡ And let's use your chart!
     chart
       .selection(chartContainer)
