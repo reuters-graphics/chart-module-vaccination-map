@@ -110,7 +110,7 @@ class VaccineMap {
         topology.objects.disputedBoundaries,
       getLandFeatures: (topology) => topology.objects.land,
     },
-    colorScaleText: '% of people receiving at least one dose',
+    colorScaleText: '% of people that received at least one dose',
     colorScaleWidth: 250,
     colorScaleMargin: 5,
     colorScaleHeight: 8,
@@ -325,13 +325,12 @@ class VaccineMap {
       .attr('width', width)
       .appendSelect('line.line.globe-ref-line')
       .style('stroke', props.globe.highlight.strokeColor)
-      .attr('x1', `${width / 2}`)
-      .attr('x2', `${width / 2}`)
+      .attr('x1', `${width / 2 + .5}`)
+      .attr('x2', `${width / 2 + .5}`)
       .attr(
         'y1',
         width > props.breakpoint
-          ? d3.select('.sentence-container').node().getBoundingClientRect()
-              .height +
+          ? d3.select('.sentence-container').node().getBoundingClientRect().height +
               width * 0.08 +
               10
           : 5
@@ -371,9 +370,14 @@ class VaccineMap {
       this._drawSphere();
 
       const p = projection(highlighted.properties.centroid);
+      const difference = highlighted.fully > 0 ? 15 : -10;
 
-      line.attr('x2', `${p[0]}`).attr('y2', `${p[1]}`);
-
+      line.attr('x2', `${p[0]}`).attr('y2', `${p[1]}`)
+        .attr('y1', (width > props.breakpoint)
+              ? d3.select('.sentence-container').node().getBoundingClientRect().height +
+                  (width * 0.08) + difference
+              : 0
+          )
       sentence.select('.country').text(highlighted.properties.name);
       sentence.select('.percent').text(() => {
         return props.numberRound(highlighted.val);
@@ -416,15 +420,12 @@ class VaccineMap {
       drawMap(projectedCentroid, selectedCountry);
       this._rotation = projection.rotate();
       rotateToPoint();
+      const difference = selectedCountry.fully > 0 ? 15 : -10;
       d3.select('line.line.globe-ref-line').attr(
         'y1',
         width > props.breakpoint
-          ? d3.select('.sentence-container').node().getBoundingClientRect()
-              .height +
-              width * 0.08 +
-              10
-          : selectedCountry.fully
-          ? 5
+          ? d3.select('.sentence-container').node().getBoundingClientRect().height +
+              (width * 0.08) + difference
           : 0
       );
     };
