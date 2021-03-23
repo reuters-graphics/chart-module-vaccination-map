@@ -153,6 +153,11 @@ $dark-blue: #2f353f;
         margin-top: -3px;
       }
       .sentence {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        left: 0;
+        right: 0;
         .country,
         .percent {
           font-size: 1.1rem;

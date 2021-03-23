@@ -1,7 +1,7 @@
 {
   "inputs": {
     "dist/scss/demo.css": {
-      "bytes": 312103,
+      "bytes": 312240,
       "imports": []
     },
     "dist/demo/App/App.svelte.css": {
@@ -277,7 +277,7 @@
       "imports": []
     },
     "dist/js/index.js": {
-      "bytes": 16352,
+      "bytes": 16713,
       "imports": [
         {
           "path": "_snowpack/pkg/d3-transition.js",
@@ -403,10 +403,10 @@
       "entryPoint": "dist/scss/demo.css",
       "inputs": {
         "dist/scss/demo.css": {
-          "bytesInOutput": 253643
+          "bytesInOutput": 253756
         }
       },
-      "bytes": 253661
+      "bytes": 253774
     },
     "../~~bundle~~/dist/demo/App/index.js": {
       "imports": [],
@@ -512,7 +512,7 @@
           "bytesInOutput": 1858
         },
         "dist/js/index.js": {
-          "bytesInOutput": 7740
+          "bytesInOutput": 7875
         },
         "dist/demo/topo.json.proxy.js": {
           "bytesInOutput": 645547
@@ -530,7 +530,7 @@
           "bytesInOutput": 44
         }
       },
-      "bytes": 2041232
+      "bytes": 2041367
     },
     "../~~bundle~~/dist/demo/App/index.css": {
       "imports": [],
