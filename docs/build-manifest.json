@@ -277,7 +277,7 @@
       "imports": []
     },
     "dist/js/index.js": {
-      "bytes": 16711,
+      "bytes": 16834,
       "imports": [
         {
           "path": "_snowpack/pkg/d3-transition.js",
@@ -485,22 +485,22 @@
           "bytesInOutput": 0
         },
         "_snowpack/pkg/d3.js": {
-          "bytesInOutput": 108915
+          "bytesInOutput": 108917
         },
         "_snowpack/pkg/common/delaunay-6cb1bb76.js": {
-          "bytesInOutput": 16340
+          "bytesInOutput": 16349
         },
         "_snowpack/pkg/topojson-client.js": {
           "bytesInOutput": 3218
         },
         "_snowpack/pkg/mustache.js": {
-          "bytesInOutput": 6590
+          "bytesInOutput": 6608
         },
         "_snowpack/pkg/d3-appendselect.js": {
           "bytesInOutput": 919
         },
         "_snowpack/pkg/d3-geo-voronoi.js": {
-          "bytesInOutput": 42596
+          "bytesInOutput": 42594
         },
         "_snowpack/pkg/lodash/merge.js": {
           "bytesInOutput": 11840
@@ -512,7 +512,7 @@
           "bytesInOutput": 1858
         },
         "dist/js/index.js": {
-          "bytesInOutput": 7873
+          "bytesInOutput": 7935
         },
         "dist/demo/topo.json.proxy.js": {
           "bytesInOutput": 645547
@@ -530,7 +530,7 @@
           "bytesInOutput": 44
         }
       },
-      "bytes": 2041365
+      "bytes": 2041454
     },
     "../~~bundle~~/dist/demo/App/index.css": {
       "imports": [],

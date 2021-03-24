@@ -1992,7 +1992,8 @@ var VaccineMap = /*#__PURE__*/function () {
       colorLabel: {
         lessText: 'Less',
         moreText: 'More'
-      }
+      },
+      maxLoops: 15
     });
 
     _defineProperty(this, "_rotation", [0, 0]);
@@ -2269,7 +2270,11 @@ var VaccineMap = /*#__PURE__*/function () {
         });
       };
 
+      var loopCount = 0;
+
       var loopCountries = function loopCountries() {
+        if (loopCount >= props.maxLoops) _this._clearTimer();
+        loopCount += 1;
         selectedCountry = filteredCountriesRandom[Math.floor(Math.random() * filteredCountriesRandom.length)];
         chosenCountry();
       };
