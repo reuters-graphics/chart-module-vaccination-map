@@ -1973,7 +1973,7 @@ var VaccineMap = /*#__PURE__*/function () {
           return num.replace('.0', '');
         }
       },
-      sentence: "<div class='country'> {{ countryName }}</div> <div class='text'><span class='percent'>{{oneDose}}</span> received at least one dose.</div> <div class='text fully-text'><span class='fully'>{{fully}}</span> have been fully vaccinated.</div>",
+      sentence: "<div class='country'> {{ countryName }}</div> <div class='text'><span class='percent'>{{oneDose}}</span> received at least one dose</div> <div class='text fully-text'><span class='fully'>{{fully}}</span> have been fully vaccinated</div>",
       topology: {
         getCountryFeatures: function getCountryFeatures(topology) {
           return topology.objects.countries;
