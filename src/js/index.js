@@ -79,7 +79,7 @@ class VaccineMap {
     globe: {
       strokeColor: 'rgba(255, 255, 255, 0.5)',
       strokeWidth: 0.1,
-      landFill: 'rgba(153,153,153,0.2)',
+      landFill: 'rgba(163, 190, 140, 0.5)',
       verticalAxisTilt: 15,
       colorFill: '#A3BE8C',
       colorBins: d3.scaleLinear()
@@ -95,9 +95,7 @@ class VaccineMap {
         opacity: 0.5,
       },
     },
-    interaction: true,
     variableName: 'perPopulation',
-    spin: false,
     spinSpeed: 12000,
     spinToSpeed: 750,
     rotateChange: 3500,
@@ -123,11 +121,11 @@ class VaccineMap {
   }
 
   _drawLand() {
-    // const { globe } = this.props();
-    // this._context.beginPath();
-    // this._path(this._land);
-    // this._context.fillStyle = globe.landFill;
-    // this._context.fill();
+    const { globe } = this.props();
+    this._context.beginPath();
+    this._path(this._land);
+    this._context.fillStyle = globe.landFill;
+    this._context.fill();
   }
 
   _drawBorders() {
@@ -356,18 +354,17 @@ class VaccineMap {
     const drawMap = (projectedCentroid, highlighted) => {
       this._context.clearRect(0, 0, width, width);
       this._drawLand();
-      
-      const all = this;
-      filteredCountries.forEach(function (d) {
-        if (d === highlighted) {
-          dC(d, all, true);
-        } else {
-          dC(d, all);
-        }
-      });
+      // const all = this;
+      // filteredCountries.forEach(function (d) {
+      //   if (d === highlighted) {
+      //     dC(d, all, true);
+      //   } else {
+      //     dC(d, all);
+      //   }
+      // });
 
-      this._context.globalAlpha = 1;
-      this._drawBorders();
+      // this._context.globalAlpha = 1;
+      // this._drawBorders();
       this._drawSphere();
 
       const p = projection(highlighted.properties.centroid);
