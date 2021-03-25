@@ -118,6 +118,7 @@ class VaccineMap {
       lessText: 'Less',
       moreText: 'More',
     },
+    maxLoops: 15,
   };
 
   _rotation = [0, 0];
@@ -415,7 +416,11 @@ class VaccineMap {
         });
     };
 
+    let loopCount = 0;
+
     const loopCountries = () => {
+      if (loopCount >= props.maxLoops) this._clearTimer();
+      loopCount += 1;
       selectedCountry =
         filteredCountriesRandom[
           Math.floor(Math.random() * filteredCountriesRandom.length)
