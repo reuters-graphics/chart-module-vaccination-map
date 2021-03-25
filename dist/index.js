@@ -2325,6 +2325,9 @@ var VaccineMap = /*#__PURE__*/function () {
       if (!props.stopShow) {
         loopCountries();
         this.globeTimer = d3.interval(loopCountries, props.rotateChange);
+      } else {
+        selectedCountry = filteredCountriesRandom[Math.floor(Math.random() * filteredCountriesRandom.length)];
+        chosenCountry();
       }
 
       var drag = function drag(projection) {

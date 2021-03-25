@@ -479,6 +479,12 @@ class VaccineMap {
     if (!props.stopShow) {
       loopCountries();
       this.globeTimer = d3.interval(loopCountries, props.rotateChange);
+    } else {
+      selectedCountry =
+        filteredCountriesRandom[
+          Math.floor(Math.random() * filteredCountriesRandom.length)
+        ];
+      chosenCountry();
     }
 
     const drag = (projection) => {
