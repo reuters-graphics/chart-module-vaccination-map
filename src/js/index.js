@@ -273,21 +273,23 @@ class VaccineMap {
 
     const voronoiCentroids = countryCentroids;
 
-    const spinMe = this.selection()
+    this.selection()
       .appendSelect('div.spin-me')
       .html(spin + `<div class="spin-text">${props.spinText}</div>`);
 
-    const sentence = this.selection()
+    const sentenceG = this.selection()
       .classed('mobile', width < props.breakpoint)
-      .appendSelect('div.sentence-container')
-      .appendSelect('div.sentence')
-      .html(
-        Mustache.render(props.sentence, {
-          countryName: 'Country',
-          oneDose: 'Percent',
-          fully: null,
-        })
-      );
+      .appendSelect('div.sentence-container');
+
+    const sentence = sentenceG.appendSelect('div.sentence').html(
+      Mustache.render(props.sentence, {
+        countryName: 'Country',
+        oneDose: 'Percent',
+        fully: null,
+      })
+    );
+    sentence.appendSelect('div.inner-arrow.arrow');
+    sentenceG.appendSelect('div.outer-arrow.arrow');
 
     const canvasContainer = this.selection()
       .appendSelect('div.canvas-container')
@@ -328,15 +330,14 @@ class VaccineMap {
       .attr('width', width)
       .appendSelect('line.line.globe-ref-line')
       .style('stroke', props.globe.highlight.strokeColor)
-      .attr('x1', `${width / 2 + 0.5}`)
-      .attr('x2', `${width / 2 + 0.5}`)
+      .attr('x1', `${width / 2 + 1}`)
+      .attr('x2', `${width / 2 + 1}`)
       .attr(
         'y1',
         width > props.breakpoint
           ? d3.select('.sentence-container').node().getBoundingClientRect()
               .height +
-              width * 0.08 +
-              10
+              width * 0.08
           : 5
       )
       .attr('y2', `${(width / 2) * 0.735}`);
@@ -374,7 +375,7 @@ class VaccineMap {
       this._drawSphere();
 
       const p = projection(highlighted.properties.centroid);
-      const difference = highlighted.fully > 0 ? 15 : -10;
+      const difference = highlighted.fully > 0 ? 10 : -4;
 
       line
         .attr('x2', `${p[0]}`)
@@ -434,7 +435,7 @@ class VaccineMap {
       drawMap(projectedCentroid, selectedCountry);
       this._rotation = projection.rotate();
       rotateToPoint();
-      const difference = selectedCountry.fully > 0 ? 15 : -10;
+      const difference = selectedCountry.fully > 0 ? 10 : -5;
       d3.select('line.line.globe-ref-line').attr(
         'y1',
         width > props.breakpoint

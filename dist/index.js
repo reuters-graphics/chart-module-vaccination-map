@@ -2203,11 +2203,14 @@ var VaccineMap = /*#__PURE__*/function () {
       });
       var voronoiCentroids = countryCentroids;
       this.selection().appendSelect('div.spin-me').html(spin + "<div class=\"spin-text\">".concat(props.spinText, "</div>"));
-      var sentence = this.selection().classed('mobile', width < props.breakpoint).appendSelect('div.sentence-container').appendSelect('div.sentence').html(Mustache__default['default'].render(props.sentence, {
+      var sentenceG = this.selection().classed('mobile', width < props.breakpoint).appendSelect('div.sentence-container');
+      var sentence = sentenceG.appendSelect('div.sentence').html(Mustache__default['default'].render(props.sentence, {
         countryName: 'Country',
         oneDose: 'Percent',
         fully: null
       }));
+      sentence.appendSelect('div.inner-arrow.arrow');
+      sentenceG.appendSelect('div.outer-arrow.arrow');
       var canvasContainer = this.selection().appendSelect('div.canvas-container').style('width', "".concat(width, "px")).style('height', "".concat(width, "px"));
       var colorScaleDiv = this.selection().appendSelect('div.color-scale-group').style('width', props.colorScaleWidth + 'px').style('left', width / 2 - props.colorScaleWidth / 2 + 'px');
       colorScaleDiv.appendSelect('div.color-scale-text').text(props.colorScaleText);
@@ -2216,7 +2219,7 @@ var VaccineMap = /*#__PURE__*/function () {
       colorLabels.appendSelect('div.less').text(props.colorLabel.lessText);
       colorLabels.appendSelect('div.more').text(props.colorLabel.moreText);
       var canvas = canvasContainer.appendSelect('canvas').attr('width', width * 2).attr('height', width * 2).style('width', "".concat(width, "px")).style('height', "".concat(width, "px"));
-      var line = canvasContainer.appendSelect('svg').attr('height', width).attr('width', width).appendSelect('line.line.globe-ref-line').style('stroke', props.globe.highlight.strokeColor).attr('x1', "".concat(width / 2 + 0.5)).attr('x2', "".concat(width / 2 + 0.5)).attr('y1', width > props.breakpoint ? d3.select('.sentence-container').node().getBoundingClientRect().height + width * 0.08 + 10 : 5).attr('y2', "".concat(width / 2 * 0.735));
+      var line = canvasContainer.appendSelect('svg').attr('height', width).attr('width', width).appendSelect('line.line.globe-ref-line').style('stroke', props.globe.highlight.strokeColor).attr('x1', "".concat(width / 2 + 1)).attr('x2', "".concat(width / 2 + 1)).attr('y1', width > props.breakpoint ? d3.select('.sentence-container').node().getBoundingClientRect().height + width * 0.08 : 5).attr('y2', "".concat(width / 2 * 0.735));
       projection.rotate(this._rotation);
       this._context = canvas.node().getContext('2d');
 
@@ -2249,7 +2252,7 @@ var VaccineMap = /*#__PURE__*/function () {
         _this._drawSphere();
 
         var p = projection(highlighted.properties.centroid);
-        var difference = highlighted.fully > 0 ? 15 : -10;
+        var difference = highlighted.fully > 0 ? 10 : -4;
         line.attr('x2', "".concat(p[0])).attr('y2', "".concat(p[1])).attr('y1', width > props.breakpoint ? d3.select('.sentence-container').node().getBoundingClientRect().height + width * 0.08 + difference : 0);
         sentence.select('.country').text(highlighted.properties.name);
         sentence.select('.percent').text(function () {
@@ -2285,7 +2288,7 @@ var VaccineMap = /*#__PURE__*/function () {
         drawMap(projectedCentroid, selectedCountry);
         _this._rotation = projection.rotate();
         rotateToPoint();
-        var difference = selectedCountry.fully > 0 ? 15 : -10;
+        var difference = selectedCountry.fully > 0 ? 10 : -5;
         d3.select('line.line.globe-ref-line').attr('y1', width > props.breakpoint ? d3.select('.sentence-container').node().getBoundingClientRect().height + width * 0.08 + difference : 0);
       };
 

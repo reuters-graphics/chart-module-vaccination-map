@@ -2,7 +2,7 @@
 @import '~@reuters-graphics/style-color/scss/thematic/brand';
 
 $VaccineMap-container: '#vaccine-map-container' !default;
-$dark-blue: #2f353f;
+$dark-blue: rgba(47, 53, 63, 0.5);
 #{$VaccineMap-container} {
   .canvas-container {
     position: relative;
@@ -62,20 +62,34 @@ $dark-blue: #2f353f;
     min-height: 95px;
     vertical-align: bottom;
     pointer-events: none;
-    &:after {
-      box-shadow: none;
-      background: $dark-blue;
-      border-right: 1.4px solid white;
-      border-top: 1.4px solid white;
-      display: block;
-      content: ' ';
-      width: 8px;
-      height: 8px;
-      border-top-right-radius: 2px;
+    .arrow {
+      width: 0px;
+      height: 0px;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 5px solid rgba(47, 53, 63, 0.5);
       position: absolute;
       left: 50%;
-      margin-left: -3px;
-      transform: rotate(135deg);
+      margin-left: -4px;
+      &.inner-arrow {
+        display: none;
+      }
+      &:after {
+        background: none;
+        border-right: 1.4px solid white;
+        border-top: 1.4px solid white;
+        display: block;
+        content: ' ';
+        width: 8px;
+        height: 8px;
+        margin-left: -4px;
+        position: absolute;
+        top: -8px;
+        transform: rotate(135deg);
+        &.inner-arrow {
+          display: none;
+        }
+      }
     }
   }
 
@@ -153,7 +167,10 @@ $dark-blue: #2f353f;
       .sentence::after {
         margin-top: 5px;
       }
-      &:after {
+      .outer-arrow {
+        display: none;
+      }
+      .outer-arrow:after {
         display: none;
       }
       .sentence {
@@ -168,20 +185,13 @@ $dark-blue: #2f353f;
         .percent {
           font-size: 1.1rem;
         }
-        &:after {
-          box-shadow: none;
-          background: $dark-blue;
-          border-right: 1.4px solid white;
-          border-top: 1.4px solid white;
-          display: block;
-          content: ' ';
-          width: 8px;
-          height: 8px;
-          border-top-right-radius: 2px;
-          position: absolute;
-          left: 50%;
-          margin-left: -3px;
-          transform: rotate(135deg);
+        .arrow {
+          &.inner-arrow {
+            display: block;
+            &:after {
+              display: block;
+            }
+          }
         }
       }
     }
