@@ -2,14 +2,14 @@
 Follow the notes below! -->
 <script>
   export let responsive; // eslint-disable-line
-  import { afterUpdate } from 'svelte';
+  import { afterUpdate, onMount } from 'svelte';
   import Docs from './App/Docs.svelte';
   import Explorer from './App/Explorer.svelte';
   import VaccineMap from '../js/index';
   import topo from './topo.json';
-  import chartData from './data.json';
 
   let chart = new VaccineMap();
+  let chartData;
   let chartContainer;
 
   // 🎚️ Create variables for any data or props you want users to be able
@@ -23,7 +23,20 @@ Follow the notes below! -->
     stopShow: autoPlay,
   };
 
-  afterUpdate(() => {
+
+  onMount(async() => {
+    const resp = await fetch('https://graphics.thomsonreuters.com/data/2020/coronavirus/owid-covid-vaccinations/latest-perpop-data-all.json');
+    const data = await resp.json();
+    chartData = data;
+    chart
+      .selection(chartContainer)
+      .data(chartData) // Pass your chartData
+      .geo(defaultGeo)
+      .props(chartProps) // Pass your chartProps
+      .draw(); // 🚀 DRAW IT!
+  })
+  afterUpdate(async() => {
+    if(!chartData) return;
     // ⚡ And let's use your chart!
     chart
       .selection(chartContainer)
