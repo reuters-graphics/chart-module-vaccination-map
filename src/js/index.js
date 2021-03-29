@@ -96,7 +96,7 @@ class VaccineMap {
     spinText: 'Spin me',
     numberRound: function (d) {
       const num = d3.format('.1~%')(d);
-      if (num === '0.0%') {
+      if (d < 0.001) {
         return '<0.1%';
       } else {
         return num.replace('.0', '');
@@ -404,9 +404,10 @@ class VaccineMap {
       sentence.select('.percent').text(() => {
         return props.numberRound(highlighted.val);
       });
+
       sentence
         .select('.fully-text')
-        .classed('hide', highlighted.fully < 0)
+        .classed('hide', highlighted.fully === 0 || highlighted.fully === null)
         .select('.fully')
         .text(props.numberRound(highlighted.fully));
     };

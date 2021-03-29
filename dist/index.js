@@ -2001,7 +2001,7 @@ var VaccineMap = /*#__PURE__*/function () {
       numberRound: function numberRound(d) {
         var num = d3.format('.1~%')(d);
 
-        if (num === '0.0%') {
+        if (d < 0.001) {
           return '<0.1%';
         } else {
           return num.replace('.0', '');
@@ -2299,7 +2299,7 @@ var VaccineMap = /*#__PURE__*/function () {
         sentence.select('.percent').text(function () {
           return props.numberRound(highlighted.val);
         });
-        sentence.select('.fully-text').classed('hide', highlighted.fully < 0).select('.fully').text(props.numberRound(highlighted.fully));
+        sentence.select('.fully-text').classed('hide', highlighted.fully === 0 || highlighted.fully === null).select('.fully').text(props.numberRound(highlighted.fully));
       };
 
       var rotateToPoint = function rotateToPoint() {
