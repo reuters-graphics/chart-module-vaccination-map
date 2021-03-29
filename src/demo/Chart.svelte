@@ -23,9 +23,10 @@ Follow the notes below! -->
     stopShow: autoPlay,
   };
 
-
-  onMount(async() => {
-    const resp = await fetch('https://graphics.thomsonreuters.com/data/2020/coronavirus/owid-covid-vaccinations/latest-perpop-data-all.json');
+  onMount(async () => {
+    const resp = await fetch(
+      'https://graphics.thomsonreuters.com/data/2020/coronavirus/owid-covid-vaccinations/latest-perpop-data-all.json'
+    );
     const data = await resp.json();
     chartData = data;
     chart
@@ -34,9 +35,9 @@ Follow the notes below! -->
       .geo(defaultGeo)
       .props(chartProps) // Pass your chartProps
       .draw(); // 🚀 DRAW IT!
-  })
-  afterUpdate(async() => {
-    if(!chartData) return;
+  });
+  afterUpdate(async () => {
+    if (!chartData) return;
     // ⚡ And let's use your chart!
     chart
       .selection(chartContainer)

@@ -50,6 +50,40 @@ function _defineProperty(obj, key, value) {
   return obj;
 }
 
+function ownKeys(object, enumerableOnly) {
+  var keys = Object.keys(object);
+
+  if (Object.getOwnPropertySymbols) {
+    var symbols = Object.getOwnPropertySymbols(object);
+    if (enumerableOnly) symbols = symbols.filter(function (sym) {
+      return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+    });
+    keys.push.apply(keys, symbols);
+  }
+
+  return keys;
+}
+
+function _objectSpread2(target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i] != null ? arguments[i] : {};
+
+    if (i % 2) {
+      ownKeys(Object(source), true).forEach(function (key) {
+        _defineProperty(target, key, source[key]);
+      });
+    } else if (Object.getOwnPropertyDescriptors) {
+      Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+    } else {
+      ownKeys(Object(source)).forEach(function (key) {
+        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+      });
+    }
+  }
+
+  return target;
+}
+
 function _slicedToArray(arr, i) {
   return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
 }
@@ -2105,7 +2139,7 @@ var VaccineMap = /*#__PURE__*/function () {
       all._path(country);
 
       all._context.fillStyle = globe.colorFill;
-      all._context.globalAlpha = globe.fillScale(country.val);
+      all._context.globalAlpha = globe.fillScale(country.colourVal);
 
       all._context.fill();
 
@@ -2153,14 +2187,18 @@ var VaccineMap = /*#__PURE__*/function () {
           width = _node$getBoundingClie.width;
 
       var projection = d3.geoOrthographic().fitExtent([[10, 10], [width - 10, width - 10]], sphere);
-      var useData = this.data();
-
-      for (var i = 0; i < useData.length; i++) {
-        var d = useData[i];
-        d.perPopulation = d.totalDoses / d.population;
-        d.vaccinatedPerPopulation = d.peopleVaccinated / d.population;
-        d.fullyVaccinatedPerPop = d.peopleFullyVaccinated / d.population;
-      }
+      var useData = this.data().map(function (d) {
+        return _objectSpread2(_objectSpread2({}, d), {}, {
+          perPopulation: d.totalDoses / d.population,
+          vaccinatedPerPopulation: d.peopleVaccinated / d.population,
+          fullyVaccinatedPerPop: d.peopleFullyVaccinated / d.population
+        });
+      }); // for (let i = 0; i < useData.length; i++) {
+      //   const d = useData[i];
+      //   d.perPopulation = d.totalDoses / d.population;
+      //   d.vaccinatedPerPopulation = d.peopleVaccinated / d.population;
+      //   d.fullyVaccinatedPerPop = d.peopleFullyVaccinated / d.population;
+      // }
 
       useData = useData.filter(function (d) {
         return d[props.variableName] > 0;
@@ -2178,12 +2216,15 @@ var VaccineMap = /*#__PURE__*/function () {
         return parseFloat(d[props.variableName]);
       })).range([0, 1]);
       filteredCountries.forEach(function (d) {
-        d.val = numberScale(parseFloat(useData.filter(function (e) {
+        d.colourVal = numberScale(parseFloat(useData.filter(function (e) {
           return e.countryISO === d.properties.isoAlpha2;
         })[0][props.variableName]));
-        d.fully = numberScale(parseFloat(useData.filter(function (e) {
+        d.val = parseFloat(useData.filter(function (e) {
           return e.countryISO === d.properties.isoAlpha2;
-        })[0].fullyVaccinatedPerPop));
+        })[0][props.variableName]);
+        d.fully = parseFloat(useData.filter(function (e) {
+          return e.countryISO === d.properties.isoAlpha2;
+        })[0].fullyVaccinatedPerPop);
       });
       var filteredCountriesRandom = filteredCountries.filter(function (d) {
         return d.val > 0.01;
@@ -2297,9 +2338,9 @@ var VaccineMap = /*#__PURE__*/function () {
       var onClickSelect = function onClickSelect(event) {
         var clickedPoint = projection.invert(d3.pointer(event));
 
-        for (var _i = 0; _i < voronoiShapefile.length; _i++) {
-          if (d3.geoContains(voronoiShapefile[_i], clickedPoint)) {
-            selectedCountry = voronoiShapefile[_i].properties.site.actualFile;
+        for (var i = 0; i < voronoiShapefile.length; i++) {
+          if (d3.geoContains(voronoiShapefile[i], clickedPoint)) {
+            selectedCountry = voronoiShapefile[i].properties.site.actualFile;
             break;
           }
         }
@@ -2311,10 +2352,10 @@ var VaccineMap = /*#__PURE__*/function () {
         var clickedPoint = projection.invert([width / 2, width / 2]);
         var chosenObj;
 
-        for (var _i2 = 0; _i2 < voronoiShapefile.length; _i2++) {
-          if (d3.geoContains(voronoiShapefile[_i2], clickedPoint)) {
+        for (var i = 0; i < voronoiShapefile.length; i++) {
+          if (d3.geoContains(voronoiShapefile[i], clickedPoint)) {
             // selectedCountry = voronoiShapefile[i].properties.site.actualFile;
-            chosenObj = voronoiShapefile[_i2].properties.site.actualFile;
+            chosenObj = voronoiShapefile[i].properties.site.actualFile;
             break;
           }
         }
@@ -2371,10 +2412,9 @@ var VaccineMap = /*#__PURE__*/function () {
           var q1 = versor.multiply(q0, delta); // For multitouch, compose with a rotation around the axis.
 
           if (p[2]) {
-            var _d = (p[2] - a0) / 2;
-
-            var s = -Math.sin(_d);
-            var c = Math.sign(Math.cos(_d));
+            var d = (p[2] - a0) / 2;
+            var s = -Math.sin(d);
+            var c = Math.sign(Math.cos(d));
             q1 = versor.multiply([Math.sqrt(1 - s * s), 0, 0, c * s], q1);
           }
 

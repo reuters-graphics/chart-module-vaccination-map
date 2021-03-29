@@ -95,7 +95,7 @@ class VaccineMap {
     stopShow: false,
     spinText: 'Spin me',
     numberRound: function(d) {
-      const num = d3.format('.1%')(d);
+      const num = d3.format('.1~%')(d);
       if (num === '0.0%') {
         return '<0.1%';
       } else {
