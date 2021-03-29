@@ -95,7 +95,7 @@ class VaccineMap {
     stopShow: false,
     spinText: 'Spin me',
     numberRound: function (d) {
-      const num = d3.format('.1%')(d);
+      const num = d3.format('.1~%')(d);
       if (num === '0.0%') {
         return '<0.1%';
       } else {
@@ -163,7 +163,7 @@ class VaccineMap {
     all._context.beginPath();
     all._path(country);
     all._context.fillStyle = globe.colorFill;
-    all._context.globalAlpha = globe.fillScale(country.val);
+    all._context.globalAlpha = globe.fillScale(country.colourVal);
 
     all._context.fill();
 
@@ -210,14 +210,21 @@ class VaccineMap {
       ],
       sphere
     );
-    let useData = this.data();
+    let useData = this.data().map((d) => {
+      return {
+        ...d,
+        perPopulation: d.totalDoses / d.population,
+        vaccinatedPerPopulation: d.peopleVaccinated / d.population,
+        fullyVaccinatedPerPop: d.peopleFullyVaccinated / d.population,
+      };
+    });
 
-    for (let i = 0; i < useData.length; i++) {
-      const d = useData[i];
-      d.perPopulation = d.totalDoses / d.population;
-      d.vaccinatedPerPopulation = d.peopleVaccinated / d.population;
-      d.fullyVaccinatedPerPop = d.peopleFullyVaccinated / d.population;
-    }
+    // for (let i = 0; i < useData.length; i++) {
+    //   const d = useData[i];
+    //   d.perPopulation = d.totalDoses / d.population;
+    //   d.vaccinatedPerPopulation = d.peopleVaccinated / d.population;
+    //   d.fullyVaccinatedPerPop = d.peopleFullyVaccinated / d.population;
+    // }
 
     useData = useData.filter((d) => d[props.variableName] > 0);
     const filteredCountryKeys = useData.map((d) => d.countryISO);
@@ -234,7 +241,7 @@ class VaccineMap {
       .range([0, 1]);
 
     filteredCountries.forEach(function (d) {
-      d.val = numberScale(
+      d.colourVal = numberScale(
         parseFloat(
           useData.filter((e) => e.countryISO === d.properties.isoAlpha2)[0][
             props.variableName
@@ -242,11 +249,15 @@ class VaccineMap {
         )
       );
 
-      d.fully = numberScale(
-        parseFloat(
-          useData.filter((e) => e.countryISO === d.properties.isoAlpha2)[0]
-            .fullyVaccinatedPerPop
-        )
+      d.val = parseFloat(
+        useData.filter((e) => e.countryISO === d.properties.isoAlpha2)[0][
+          props.variableName
+        ]
+      );
+
+      d.fully = parseFloat(
+        useData.filter((e) => e.countryISO === d.properties.isoAlpha2)[0]
+          .fullyVaccinatedPerPop
       );
     });
 
