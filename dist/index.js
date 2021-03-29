@@ -1999,7 +1999,7 @@ var VaccineMap = /*#__PURE__*/function () {
       stopShow: false,
       spinText: 'Spin me',
       numberRound: function numberRound(d) {
-        var num = d3.format('.1%')(d);
+        var num = d3.format('.1~%')(d);
 
         if (num === '0.0%') {
           return '<0.1%';

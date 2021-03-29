@@ -94,7 +94,7 @@ class VaccineMap {
     breakpoint: 600,
     stopShow: false,
     spinText: 'Spin me',
-    numberRound: function(d) {
+    numberRound: function (d) {
       const num = d3.format('.1~%')(d);
       if (num === '0.0%') {
         return '<0.1%';
@@ -240,7 +240,7 @@ class VaccineMap {
       .domain(d3.extent(useData, (d) => parseFloat(d[props.variableName])))
       .range([0, 1]);
 
-    filteredCountries.forEach(function(d) {
+    filteredCountries.forEach(function (d) {
       d.colourVal = numberScale(
         parseFloat(
           useData.filter((e) => e.countryISO === d.properties.isoAlpha2)[0][
@@ -345,11 +345,11 @@ class VaccineMap {
       .attr('x2', `${width / 2 + 1}`)
       .attr(
         'y1',
-        width > props.breakpoint ?
-          d3.select('.sentence-container').node().getBoundingClientRect()
-            .height +
-              width * 0.08 :
-          5
+        width > props.breakpoint
+          ? d3.select('.sentence-container').node().getBoundingClientRect()
+              .height +
+              width * 0.08
+          : 5
       )
       .attr('y2', `${(width / 2) * 0.735}`);
 
@@ -374,7 +374,7 @@ class VaccineMap {
       this._drawLand();
       this._drawBorders();
       const all = this;
-      filteredCountries.forEach(function(d) {
+      filteredCountries.forEach(function (d) {
         if (d === highlighted) {
           dC(d, all, true);
         } else {
@@ -393,12 +393,12 @@ class VaccineMap {
         .attr('y2', `${p[1]}`)
         .attr(
           'y1',
-          width > props.breakpoint ?
-            d3.select('.sentence-container').node().getBoundingClientRect()
-              .height +
+          width > props.breakpoint
+            ? d3.select('.sentence-container').node().getBoundingClientRect()
+                .height +
                 width * 0.08 +
-                difference :
-            0
+                difference
+            : 0
         );
       sentence.select('.country').text(highlighted.properties.name);
       sentence.select('.percent').text(() => {
@@ -449,12 +449,12 @@ class VaccineMap {
       const difference = selectedCountry.fully > 0 ? 10 : -5;
       d3.select('line.line.globe-ref-line').attr(
         'y1',
-        width > props.breakpoint ?
-          d3.select('.sentence-container').node().getBoundingClientRect()
-            .height +
+        width > props.breakpoint
+          ? d3.select('.sentence-container').node().getBoundingClientRect()
+              .height +
               width * 0.08 +
-              difference :
-          0
+              difference
+          : 0
       );
     };
     const voronoiShapefile = geoVoronoi().polygons(voronoiCentroids).features;
@@ -553,7 +553,7 @@ class VaccineMap {
 
     canvas
       .call(
-        drag(projection).on('drag.render', function() {
+        drag(projection).on('drag.render', function () {
           onDragSelect();
         })
       )

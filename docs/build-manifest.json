@@ -277,7 +277,7 @@
       "imports": []
     },
     "dist/js/index.js": {
-      "bytes": 17474,
+      "bytes": 17475,
       "imports": [
         {
           "path": "_snowpack/pkg/d3-transition.js",
@@ -504,7 +504,7 @@
           "bytesInOutput": 1858
         },
         "dist/js/index.js": {
-          "bytesInOutput": 8156
+          "bytesInOutput": 8157
         },
         "dist/demo/topo.json.proxy.js": {
           "bytesInOutput": 645547
@@ -519,7 +519,7 @@
           "bytesInOutput": 44
         }
       },
-      "bytes": 2009624
+      "bytes": 2009625
     },
     "../~~bundle~~/dist/demo/App/index.css": {
       "imports": [],
